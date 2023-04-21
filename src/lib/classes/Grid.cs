@@ -9,7 +9,7 @@ namespace Classes.GameGrid;
 #nullable enable
 public delegate bool IterateGridDelegate(int X, int Y, Cell? cell);
 public delegate bool IterateExclusiveDelegate(Cell cell);
-public delegate Cell FillDelegate(int X, int Y);
+public delegate Cell? FillDelegate(int X, int Y);
 
 public class CellBounds : IQuadTreeObjectBounds<Cell> {
     public float GetBottom(Cell obj) => obj.Bounds.Bottom;
@@ -23,9 +23,10 @@ public class Grid {
     public Cell[,] cellGrid;
     public QuadTree<Cell> quadGrid;
 
-    public Vector2 worldSize;
+    public Point worldSize;
 
-    public Grid(Vector2 worldSize) {
+    public Grid(Vector2 worldSize) : this(new Point((int) worldSize.X, (int) worldSize.Y)) { }
+    public Grid(Point worldSize) {
         this.worldSize = worldSize;
 
         cellList = new List<Cell>();
@@ -39,7 +40,7 @@ public class Grid {
         quadGrid.Clear();
     }
 
-    public void InsertCell(Cell? cell) {
+    public void InsertCell(Cell cell) {
         // Check if there is already a cell in a specific position
         Cell? currentValue = GetInGrid(cell.Position.X, cell.Position.Y);
         if (currentValue != null) {
@@ -59,7 +60,7 @@ public class Grid {
     public void FillGrid(FillDelegate callback) {
         for (int X = 0; X < worldSize.X; ++X) {
             for (int Y = 0; Y < worldSize.Y; ++Y) {
-                Cell result = callback(X, Y);
+                Cell? result = callback(X, Y);
 
                 if (result != null) InsertCell(result);
             }
