@@ -1,3 +1,5 @@
+#nullable enable
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
@@ -20,16 +22,20 @@ public abstract class GraphicalInstance {
     protected Point drawPosition;
     public Point Position { get { return drawPosition; } set {
         drawPosition = value;
-        onPositionUpdated();
+        OnPositionUpdated();
+        UpdateAllChildrenOffsets();
     }}
 
     protected Point size;
     public Point Size {
         get { return size; } set {
             size = value;
-            onSizeUpdated();
+            OnSizeUpdated();
         }
     }
+
+    protected Point drawOffset;
+    private Dictionary<int, GraphicalInstance> children;
 
     protected GraphicalInstance() : this(new Point(0, 0), new Point(50, 50), true) { }
     protected GraphicalInstance(Point position) : this(position, new Point(50, 50), true) { }
@@ -38,11 +44,36 @@ public abstract class GraphicalInstance {
         this.Position = position;
         this.Size = size;
         this.Visible = visible;
+
+        children = new Dictionary<int, GraphicalInstance>();
     }
 
-    protected virtual void onPositionUpdated() { }
-    protected virtual void onSizeUpdated() { }
+    private int nextChildAddIndex = 0;
+    //@return - returns the index at which the child was added to
+    public int AddChild(GraphicalInstance child) {
+        children[nextChildAddIndex] = child;
+        ++nextChildAddIndex;
 
-    public virtual void Update() { }
-    public abstract void Draw();
+        return nextChildAddIndex - 1;
+    }
+
+    public void RemoveChild(int index) {
+        children.Remove(index);
+    }
+
+    private void UpdateAllChildrenOffsets() {
+        foreach (var (index, child) in children) {
+            child.OffsetChanged(Position);
+        }
+    }
+
+    protected virtual void OffsetChanged(Point newOffset) {
+        this.drawOffset = newOffset;
+    }
+
+    protected virtual void OnPositionUpdated() { }
+    protected virtual void OnSizeUpdated() { }
+
+    public virtual void Update(GameTime gameTime) { }
+    public abstract void Draw(SpriteBatch spriteBatch);
 }

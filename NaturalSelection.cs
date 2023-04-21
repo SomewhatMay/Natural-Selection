@@ -34,8 +34,6 @@ public class NaturalSelection : Game
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
 
-        _graphics.ApplyChanges();
-
         this.IsFixedTimeStep = false;
 
         if (Constants.Seed == null) {
@@ -54,6 +52,7 @@ public class NaturalSelection : Game
     }
 
     protected override void Initialize() {
+        _graphics.ApplyChanges();
         // TODO: Add your initialization logic here
 
         // let's call initialize after all services are loaded

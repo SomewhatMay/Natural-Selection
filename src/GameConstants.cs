@@ -5,7 +5,7 @@ namespace ConstantsNamespace;
 
 public static class Constants {
     public static int? Seed = null; // can be null, null => random seed
-    public static double UpdateRate = 5f; // The rate at which .Next() is called in a cell; in miliseconds
+    public static double UpdateRate = 16f; // The rate at which .Next() is called in a cell; in miliseconds
     public static int ScheduleSize = 8; // The size of the schedules each cell has
     public static float MutationChance = 0.4f; // The chance that the next cell generation mutates 
     public static int ChanceMax = 100; // the max value put in when calculating the number of cells to be generated

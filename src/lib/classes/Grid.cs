@@ -34,6 +34,21 @@ public class Grid {
         cellGrid = new Cell[(int) worldSize.X, (int) worldSize.Y];
     }
 
+    public static int CountNonNull<T>(T[,] array) {
+        int count = 0;
+        for (int i = 0; i < array.GetLength(0); i++)
+        {
+            for (int j = 0; j < array.GetLength(1); j++)
+            {
+                if (array[i, j] != null)
+                {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
     public void Clear() {
         cellList.Clear();
         Array.Clear(cellGrid);
@@ -44,7 +59,7 @@ public class Grid {
         // Check if there is already a cell in a specific position
         Cell? currentValue = GetInGrid(cell.Position.X, cell.Position.Y);
         if (currentValue != null) {
-            throw new System.Exception("Cannot overwrite a grid field that already has a cell");
+            throw new System.Exception($"Cannot overwrite a grid field that already has a cell. Current Cell Type:{currentValue.GetType()}. New cell:{cell.GetType()}");
         }
 
         cellList.Add(cell);
