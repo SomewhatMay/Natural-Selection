@@ -27,11 +27,6 @@ public class MainWorld : Service {
         lastUpdate = System.Environment.TickCount;
     }
 
-    public override void Init(Dictionary<string, Service> loadedServices) {
-        this.loadedServices = loadedServices;
-        base.Init(loadedServices);
-    }
-
     public override void LoadContent() {
         Cell.Load(this.game.GraphicsDevice, loadedServices);
         spriteBatch = new SpriteBatch(this.game.GraphicsDevice);
