@@ -1,6 +1,9 @@
+#nullable enable
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Linq;
 
 using NaturalSelectionRemastered;
 using Classes.GameGrid;
@@ -50,18 +53,75 @@ public class MainWorld : Service {
         gameGrid = new Grid(Constants.WorldExtents);
         this.garrisonedCells = new List<Cell>();
 
+        NextGeneration();
+    }
+
+    private bool isFoodFinished() {
+        if (Statistics.FoodAlive > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private LifeCell[] getLeaderboard(Grid currentGrid) {
+        LifeCell[] leaderboard = new LifeCell[10];
+
+        currentGrid.IterateExclusiveAll((Cell cell) => {
+            if (cell is LifeCell) {
+                LifeCell currentCell = (LifeCell) cell;
+
+                int leaderboardLength = leaderboard.Count();
+
+                if (! (leaderboardLength > 10 && currentCell.Points < leaderboard[leaderboardLength - 1].Points)) {
+                    bool inserted = false;
+
+                    for (int index = 0; index < leaderboardLength; ++index) {
+                        LifeCell topCell = leaderboard[index];
+
+                        if (currentCell.Points > topCell.Points) {
+                            
+
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            return true;
+        });
+
+        return leaderboard;
+    }
+
+    public void NextGeneration(Grid? currentGrid, Grid? garrisonedGrid) {
+        ++Statistics.Generation; // Let's increment the generation
+        Statistics.Day = 0;
+        Statistics.CellsAlive = 0;
+        Statistics.CellsGarrisoned = 0;
+        Statistics.FoodAlive = 0;
+        Statistics.FoodEaten = 0;
+
+        // Determine the top 10 cells
+        // [1 ...] = LifeCell;
+        LifeCell[] leaderboard = new LifeCell[10];
+
+        if (currentGrid != null) {
+
+        }
+
         // Load all the cells
         #nullable enable
         gameGrid.FillGrid((int x, int y) => {
-            int chance = gameRandom.Next(0, 1000);
+            int chance = gameRandom.Next(0, Constants.ChanceMax);
 
-            if (chance == 1) {
+            if (Constants.LifeCellRandomValues.Contains(chance)) {
                 Cell lifeCell = new LifeCell(
                     new Point(x, y)
                 );
 
                 return lifeCell;
-            } else if (chance == 2 || chance == 3) {
+            } else if (Constants.FoodCellRandomValues.Contains(chance)) {
                 Cell foodCell = new FoodCell(
                     new Point(x, y)
                 );
@@ -71,14 +131,6 @@ public class MainWorld : Service {
 
             return null;
         });
-    }
-
-    public bool isFoodFinished() {
-        if (Statistics.FoodAlive > 0) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     public void NextDay() {
