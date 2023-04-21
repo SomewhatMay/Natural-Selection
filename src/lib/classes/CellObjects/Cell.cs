@@ -1,5 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
+using System;
 
 using ConstantsNamespace;
 
@@ -8,10 +10,12 @@ namespace Classes.CellObjects;
 public abstract class Cell {
     // static fields and methods
     protected static GraphicsDevice graphicsDevice;
+    protected static Dictionary<string, Service> loadedServices;
 
     // loads the cell class statically before calling any object-based methods
-    public static void Load(GraphicsDevice _graphicsDevice) {
+    public static void Load(GraphicsDevice _graphicsDevice, Dictionary<string, Service> _loadedServices) {
         graphicsDevice = _graphicsDevice;
+        loadedServices = _loadedServices;
     }
 
     // object-oriented fields and methods

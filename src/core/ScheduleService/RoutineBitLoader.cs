@@ -26,8 +26,13 @@ public static class RoutineBitLoader {
         };
     }
 
+    //  **  NOTE  ** 
+    // All of the folloing bits get an extra added to them because Random.Next(int min, int maax) returns a value that is max exclusive
+    // meaning it only returns a value that is less than the max; however, the connection does not have one added because indexes of arrays
+    // are 0 to the lenght - 1, so adding one to it would go out of the array. 
+
     public static string EvalType() {
-        return gameRandom.Next(0, 5).ToString();
+        return gameRandom.Next(0, 6).ToString();
     }
 
     public static string ConnectionPointer() {
@@ -35,22 +40,22 @@ public static class RoutineBitLoader {
     }
 
     public static string ActionType() {
-        return gameRandom.Next(0, 1).ToString();
+        return gameRandom.Next(0, 2).ToString();
     }
 
     public static string AssistingBit1() {
-        return gameRandom.Next().ToString();
+        return gameRandom.Next(0, 10).ToString();
     }
 
     public static string AssistingBit2() {
-        return gameRandom.Next(0, 1).ToString();
+        return gameRandom.Next(0, 2).ToString();
     }
 
     public static string AssistingBit3() {
-        return gameRandom.Next().ToString();
+        return gameRandom.Next(0, 10).ToString();
     }
 
     public static string EvalBit() {
-        return gameRandom.Next().ToString();
+        return gameRandom.Next(0, 10).ToString();
     }
 }

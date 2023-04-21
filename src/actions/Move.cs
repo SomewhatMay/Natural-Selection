@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Classes.CellObjects;
 using ConstantsNamespace;
 using Other;
+using System;
 
 namespace Actions;
 
@@ -12,7 +13,7 @@ public class Move : IAction {
     
     public int Invoke(Cell cell, int? direction) {
         if (direction == null) {
-            direction = 0;
+            direction = 2;
         } else {
             // Wrap the direction
             direction = direction % 4;

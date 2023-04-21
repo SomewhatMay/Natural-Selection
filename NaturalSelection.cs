@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System;
 
+using Core.ScheduleService;
 using ConstantsNamespace;
 using Classes;
 using Core;
@@ -27,8 +28,15 @@ public class NaturalSelection : Game
 
     public NaturalSelection() {
         _graphics = new GraphicsDeviceManager(this);
+        _graphics.PreferredBackBufferWidth = Constants.WindowSize.X;
+        _graphics.PreferredBackBufferHeight = Constants.WindowSize.Y;
+        _graphics.SynchronizeWithVerticalRetrace = false;
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
+
+        _graphics.ApplyChanges();
+
+        this.IsFixedTimeStep = false;
 
         if (Constants.Seed == null) {
             gameRandom = new Random();
@@ -42,6 +50,7 @@ public class NaturalSelection : Game
         // let's load all the services
         loadedServices = new Dictionary<string, Service>();
         LoadService("MainWorld", new MainWorld(this, gameRandom));
+        LoadService("Schedule", new ScheduleService(this, gameRandom));
     }
 
     protected override void Initialize() {
