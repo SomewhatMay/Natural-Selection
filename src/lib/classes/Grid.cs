@@ -52,7 +52,15 @@ public class Grid {
         cellGrid[cell.Position.X, cell.Position.Y] = cell;
     }
 
+    public Cell GetInGrid(Vector2 position) => GetInGrid((int) position.X, (int) position.Y);
+    public Cell GetInGrid(Point position) => GetInGrid(position.X, position.Y);
     public Cell GetInGrid(int X, int Y) {
+        // try {
+        //     var cellGrid[X, Y];
+        // } catch (System.IndexOutOfRangeException) {
+        //     Console.WriteLine($"Index out of range: ({X}, {Y})");
+        // }
+
         return cellGrid[X, Y];
     }
 

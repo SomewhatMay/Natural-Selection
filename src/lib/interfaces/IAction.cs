@@ -1,6 +1,6 @@
 using Classes.CellObjects;
 
-namespace Other;
+namespace Interfaces;
 
 public interface IAction {
     public int Invoke(Cell cell, int? argument);

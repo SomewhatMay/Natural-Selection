@@ -3,6 +3,7 @@ using Classes.CellObjects;
 using ConstantsNamespace;
 using Other;
 using System;
+using Interfaces;
 
 namespace Actions;
 
@@ -34,14 +35,14 @@ public class Move : IAction {
         cell.Position = cell.Position + directionOffset;
 
         // Let's wrap the cell if it's out of bounds
-        if (cell.Position.X > Constants.WorldExtents.X) {
+        if (cell.Position.X >= Constants.WorldExtents.X) {
             cell.Position = new Point(0, cell.Position.Y);
         } else if (cell.Position.X < 0) {
-            cell.Position = new Point(Constants.WorldExtents.X, cell.Position.Y);
-        } else if (cell.Position.Y > Constants.WorldExtents.Y) {
+            cell.Position = new Point(Constants.WorldExtents.X - 1, cell.Position.Y);
+        } else if (cell.Position.Y >= Constants.WorldExtents.Y) {
             cell.Position = new Point(cell.Position.X, 0);
         } else if (cell.Position.Y < 0) {
-            cell.Position = new Point(cell.Position.X, Constants.WorldExtents.Y);
+            cell.Position = new Point(cell.Position.X, Constants.WorldExtents.Y - 1);
         }
 
         return (int) direction;
