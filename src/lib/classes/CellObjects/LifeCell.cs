@@ -1,5 +1,5 @@
 using Microsoft.Xna.Framework;
-using Core.ScheduleService;
+using Core.Schedule;
 using System;
 
 namespace Classes.CellObjects;
@@ -14,13 +14,14 @@ public class LifeCell : Cell {
 
     private ScheduleService scheduleService;
 
-    public LifeCell(Point? position = null, Color? color = null) : base(position, color) {
+    #nullable enable
+    public LifeCell(Point? position = null, string[]? schedule = null) : base(position, Color.White) {
         Points = 0;
         Ancestry = "00000";
         Alive = true;
         
         scheduleService = (ScheduleService) loadedServices["Schedule"];
-        Schedule = scheduleService.newSchedule();
+        Schedule = schedule ?? scheduleService.newSchedule();
     }
 
     public void Next() {

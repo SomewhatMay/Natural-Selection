@@ -7,7 +7,7 @@ using Other;
 using Interfaces;
 using Actions;
 
-namespace Core.ScheduleService;
+namespace Core.Schedule;
 
 public class ScheduleService : Service {
     Random gameRandom;
@@ -88,6 +88,10 @@ public class ScheduleService : Service {
         }
 
         cell.LatestResult = actionReturn;
+    }
+
+    public void MutateCell(LifeCell cell, string[] targetSchedule) {
+
     }
 
     private int wrap(int number, int max) {

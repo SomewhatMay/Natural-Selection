@@ -1,7 +1,7 @@
 using System;
 using ConstantsNamespace;
 
-namespace Core.ScheduleService;
+namespace Core.Schedule;
 
 public delegate string BitLoaderDelegate();
 

@@ -11,6 +11,7 @@ using Classes;
 using Classes.CellObjects;
 using ConstantsNamespace;
 using System.Collections.Generic;
+using Core.Schedule;
 using Other;
 
 namespace Core;
@@ -37,16 +38,33 @@ public class MainWorld : Service {
 
     Random gameRandom;
 
-    public double lastUpdate { get; private set; }
+    DifferenceTime lastUpdate;
+    DifferenceTime generationElapsedTime;
 
+    ScheduleService scheduleService;
+
+    // Create a 2D array for all the cells that will be repasted. Loading on stack so garbage collector doesnt get mad lol
+    Cell?[,] repastableCells = new Cell?[Constants.WorldExtents.X, Constants.WorldExtents.Y];
+
+    #nullable disable
     public MainWorld(Game game, Random gameRandom) : base(game) {
         this.game = game;
         this.gameRandom = gameRandom;
-        
-        lastUpdate = 0f;
+
+        lastUpdate = new DifferenceTime();
+        generationElapsedTime = new DifferenceTime();
     }
 
+    public override void Init(Dictionary<string, Service> loadedServices) {
+        base.Init(loadedServices);
+
+        scheduleService = (ScheduleService) loadedServices["Schedule"];
+    }
+
+    #nullable enable
     public override void LoadContent() {
+        lastUpdate.Start();
+
         Cell.Load(this.game.GraphicsDevice, loadedServices);
         spriteBatch = new SpriteBatch(this.game.GraphicsDevice);
 
@@ -58,9 +76,12 @@ public class MainWorld : Service {
 
     private bool isFoodFinished() {
         if (Statistics.FoodAlive > 0) {
-            return true;
-        } else {
             return false;
+        } else {
+            // Lets move to the next generation if all the food is finished!
+            NextGeneration();
+            
+            return true;
         }
     }
 
@@ -116,7 +137,12 @@ public class MainWorld : Service {
         if ((currentGrid != null) && (garrisonedGrid != null)) {
             updateLeaderboard(leaderboard, currentGrid);
             updateLeaderboard(leaderboard, garrisonedGrid);
+
+            Console.WriteLine($"New generation started! Last generation took {generationElapsedTime.Calculate()} ms!");
         }
+
+        // Empty the grid
+        gameGrid.Clear();
 
         // Load all the cells
         #nullable enable
@@ -124,12 +150,41 @@ public class MainWorld : Service {
             int chance = gameRandom.Next(0, Constants.ChanceMax);
 
             if (Constants.LifeCellRandomValues.Contains(chance)) {
-                Cell lifeCell = new LifeCell(
+                ++Statistics.CellsAlive;
+                LifeCell lifeCell = new LifeCell(
                     new Point(x, y)
                 );
 
+                // Let's find a parent cell and inherit it's schedule
+                if (currentGrid != null) {
+                    float chosenAncestryPercent = gameRandom.Next(0, 100) / 100f;
+
+                    // Let's ensure our cell's ancestry does not land in the UnsignedSchedule percent 
+                    if (chosenAncestryPercent <= Constants.ReproductionUnsignedSchedulePercent) {
+                        LifeCell? chosenCell = null;
+
+                        for (int rank = 0; rank < Constants.ReproductionPercentDictionary.Count; ++rank) {
+                            // We know that the 0th item in the leaderboard doesnt have anything before it so we set the minimum value to -1 instead
+                            // The reason it's -1 is because the if statement later checks if it is greater than minPercent
+                            float minPercent = ((rank == 0) ? -1 : Constants.ReproductionPercentDictionary[rank - 1]);
+                            float percent = Constants.ReproductionPercentDictionary[rank];
+
+                            if (chosenAncestryPercent > minPercent && chosenAncestryPercent <= percent) {
+                                chosenCell = leaderboard[rank];
+
+                                break;
+                            }
+                        }
+
+                        if (chosenCell != null) {
+                            scheduleService.MutateCell(lifeCell, chosenCell.Schedule);
+                        } else throw new Exception($"No chosen cell! Leaderboard length {leaderboard.Count}");
+                    }
+                }
+
                 return lifeCell;
             } else if (Constants.FoodCellRandomValues.Contains(chance)) {
+                ++Statistics.FoodAlive;
                 Cell foodCell = new FoodCell(
                     new Point(x, y)
                 );
@@ -148,8 +203,7 @@ public class MainWorld : Service {
         int currentDay = Statistics.Day;
         int currentGeneration = Statistics.Generation;
 
-        // Create a 2D array for all the cells that will be repasted
-        Cell?[,] repastableCells = new Cell?[Constants.WorldExtents.X, Constants.WorldExtents.Y];
+        Array.Clear(repastableCells);
 
         gameGrid.IterateExclusiveAll((Cell cell) => {
             bool repaste = false; // whether we should repaste the cell into the next grid
@@ -235,11 +289,11 @@ public class MainWorld : Service {
     }
 
     public override void Update(GameTime gameTime) {
-        if ((gameTime.TotalGameTime.TotalMilliseconds - lastUpdate) >= Constants.UpdateRate) {
+        if (lastUpdate.Calculate() >= Constants.UpdateRate) {
 
             NextDay();
 
-            lastUpdate = gameTime.TotalGameTime.TotalMilliseconds;
+            lastUpdate.Start();
         }
     } 
 

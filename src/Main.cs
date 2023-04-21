@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System;
 
-using Core.ScheduleService;
+using Core.Schedule;
 using ConstantsNamespace;
 using Classes;
 using Core;

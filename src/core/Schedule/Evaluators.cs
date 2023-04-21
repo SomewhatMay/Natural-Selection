@@ -1,5 +1,5 @@
 
-namespace Core.ScheduleService;
+namespace Core.Schedule;
 
 public delegate bool EvalDelegate(int argumentA, int argumentB);
 
