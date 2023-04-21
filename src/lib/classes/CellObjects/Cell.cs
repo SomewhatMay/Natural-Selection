@@ -1,7 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-using Constants;
+using ConstantsNamespace;
 
 namespace Classes.CellObjects;
 
@@ -30,7 +30,7 @@ public abstract class Cell {
     public Point Position {
         get { return position; } set { 
             position = value;
-            drawPosition = value * Constants.Constants.CellSize;
+            drawPosition = value * Constants.CellSize;
             newRectangle();
         }
     }
@@ -55,7 +55,7 @@ public abstract class Cell {
         cellBackground = new Texture2D(graphicsDevice, 1, 1);
 
         this.Position = position ?? new Point(0, 0);
-        this.Size = Constants.Constants.CellSize;
+        this.Size = Constants.CellSize;
         this.Color = color ?? Color.White;
 
         newRectangle();

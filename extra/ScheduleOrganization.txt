@@ -1,0 +1,80 @@
+Here is how schedules are organized:
+
+0 refers to any possible single-digit number.
+
+Min schedule size:
+00000000 ( <2,400,000 )
+
+
+=======================================
+------<//[  Evaluation Type  ]\\>------
+=======================================
+Determines the evaluation type.
+--> 0 ( <6 - <10 )
+Posibilities -> {
+    0 ->    equal                       
+    1 ->    not equal                   
+    2 ->    less than                   
+    3 ->    greater than                
+    4 ->    less than or equal to       
+    5 ->    greater than or equal to    
+}                                       ~> Proceed to Connection A if true, otherwise proceed to Connection B
+
+====================================
+------<//[  Connection A  ]\\>------
+====================================
+Determines connection A; another action
+--> 0 ( <10 )
+Posibilities -> {
+    X ->     Refers to the position in the schedule of another connection
+}
+
+====================================
+------<//[  Connection B  ]\\>------
+====================================
+Determines connection B; another action
+--> 0 ( <10 )
+Posibilities -> {
+    X ->     Refers to the position in the schedule of another connection
+}
+
+===================================
+------<//[  Action Type  ]\\>------
+===================================
+Determines what type of item is being called and passed into the next connection
+--> 0 ( <2 - <10 )
+Posibilities -> {
+    0 ->     This means the current connection is an action found in ./Action (see below)
+    1 ->     This means the current connection is not a function, it is a static variable (see below)
+}
+
+------<//[  Assisting Bit 1  ]\\>------
+Always appears right after the previous bit. Determines the file being called. In the case of it being 
+a static variable, it refers to a number being passed into the next method
+--> +0 ~> (concatinated is 00) ( <10 )
+Posibilities -> {
+    X ->     Refers to either a file number found in ./Action or a static number
+}
+
+------<//[  Assisting Bit 2  ]\\>------
+Always appears right after the previous bit. 
+Determines whether the action being called gets the arguemnts from pervious method or not.
+--> +0 ~> (concatinated is 000) ( <2 - <10 )
+Posibilities -> {
+    0 ->     Passes the arguments called from the previous method. Nil if there is none
+    1 ->     Passes a static number determined by the next assisting bit.
+}
+
+------<//[  Assisting Bit 3  ]\\>------
+Always appears right after the previous bit. Someimes ignored.
+--> +0 ~> (concatinated is 0000) ( <10 )
+Posibilities -> {
+    X ->     A number that gets passed into the next connection instead of the returns depending on the previous bit
+}
+
+------<//[  Eval Bit  ]\\>------
+Always appears right after the previous bit.
+--> +0 ~> (concatinated is 00000) ( <10 )
+Posibilities -> {
+    X ->     This is the bit that is evaled with the return of the action
+}

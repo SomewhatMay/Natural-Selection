@@ -4,44 +4,53 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System;
 
-using Constants;
+using ConstantsNamespace;
 using Classes;
 using Core;
 
 namespace NaturalSelectionRemastered;
 
-public class Game1 : Game
+public class NaturalSelection : Game
 {
     public GraphicsDeviceManager _graphics;
     public SpriteBatch _spriteBatch;
 
     public Random gameRandom;
 
-    public List<Service> loadedServices;
+    public Dictionary<string, Service> loadedServices;
 
-    public Service LoadService(Service service) {
-        loadedServices.Add(service);
+    public Service LoadService(string serviceName, Service service) {
+        loadedServices.Add(serviceName, service);
 
         return service;
     }
 
-    public Game1() {
+    public NaturalSelection() {
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
 
-        gameRandom = new Random();
+        if (Constants.Seed == null) {
+            gameRandom = new Random();
+        } else {
+            gameRandom = new Random((int) Constants.Seed);
+        }
 
         // initialize the constants 
-        Constants.Constants.Initialize();
+        Constants.Initialize();
 
         // let's load all the services
-        loadedServices = new List<Service>();
-        LoadService(new MainWorld(this, gameRandom));
+        loadedServices = new Dictionary<string, Service>();
+        LoadService("MainWorld", new MainWorld(this, gameRandom));
     }
 
     protected override void Initialize() {
         // TODO: Add your initialization logic here
+
+        // let's call initialize after all services are loaded
+        foreach (KeyValuePair<string, Service> pair in loadedServices) {
+            pair.Value.Init(loadedServices);
+        }
 
         base.Initialize();
     }
@@ -50,8 +59,8 @@ public class Game1 : Game
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
         // TODO: use this.Content to load your game content here
-        foreach (Service service in loadedServices) {
-            service.LoadContent();
+        foreach (KeyValuePair<string, Service> pair in loadedServices) {
+            pair.Value.LoadContent();
         }
     }
 
@@ -61,8 +70,8 @@ public class Game1 : Game
 
         // TODO: Add your update logic here
 
-        foreach (Service service in loadedServices) {
-            service.Update(gameTime);
+        foreach (KeyValuePair<string, Service> pair in loadedServices) {
+            pair.Value.Update(gameTime);
         }
 
         base.Update(gameTime);
@@ -73,8 +82,8 @@ public class Game1 : Game
 
         // TODO: Add your drawing code here
 
-        foreach (Service service in loadedServices) {
-            service.Draw(gameTime);
+        foreach (KeyValuePair<string, Service> pair in loadedServices) {
+            pair.Value.Draw(gameTime);
         }
 
 

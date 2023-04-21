@@ -6,7 +6,7 @@ using NaturalSelectionRemastered;
 using Classes.GameGrid;
 using Classes;
 using Classes.CellObjects;
-using Constants;
+using ConstantsNamespace;
 
 namespace Core;
 
@@ -25,7 +25,7 @@ public class MainWorld : Service {
         Cell.Load(this.game.GraphicsDevice);
         spriteBatch = new SpriteBatch(this.game.GraphicsDevice);
 
-        gameGrid = new Grid(Constants.Constants.WorldExtents);
+        gameGrid = new Grid(Constants.WorldExtents);
 
         // Load all the cells
         #nullable enable

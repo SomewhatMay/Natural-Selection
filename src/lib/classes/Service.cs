@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 
 namespace Classes;
 
@@ -9,8 +10,8 @@ public abstract class Service {
         this.game = game;
     }
 
-    public abstract void LoadContent();
-    public abstract void Update(GameTime gameTime);
-    public abstract void Draw(GameTime gameTime);
-
+    public virtual void Init(Dictionary<string, Service> loadedServices) { } // used for getting references to other services
+    public virtual void LoadContent() { } // used to load content
+    public virtual void Update(GameTime gameTime) { }
+    public virtual void Draw(GameTime gameTime) { }
 }
