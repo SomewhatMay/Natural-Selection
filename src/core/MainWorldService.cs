@@ -64,14 +64,12 @@ public class MainWorld : Service {
         }
     }
 
-    private LifeCell[] getLeaderboard(Grid currentGrid) {
-        LifeCell[] leaderboard = new LifeCell[10];
-
+    private void updateLeaderboard(List<LifeCell> leaderboard, Grid currentGrid) {
         currentGrid.IterateExclusiveAll((Cell cell) => {
             if (cell is LifeCell) {
                 LifeCell currentCell = (LifeCell) cell;
 
-                int leaderboardLength = leaderboard.Count();
+                int leaderboardLength = leaderboard.Count;
 
                 if (! (leaderboardLength > 10 && currentCell.Points < leaderboard[leaderboardLength - 1].Points)) {
                     bool inserted = false;
@@ -80,21 +78,30 @@ public class MainWorld : Service {
                         LifeCell topCell = leaderboard[index];
 
                         if (currentCell.Points > topCell.Points) {
-                            
+                            leaderboard.Insert(index, currentCell);
+                            inserted = true;
+                            ++leaderboardLength;
 
                             break;
                         }
+                    }
+
+                    if ((!inserted) && (leaderboardLength < 10)) {
+                        leaderboard.Add(currentCell);
+                        ++leaderboardLength;
+                    }
+
+                    if (leaderboardLength > 10) {
+                        leaderboard.RemoveAt(leaderboardLength - 1);
                     }
                 }
             }
             
             return true;
         });
-
-        return leaderboard;
     }
 
-    public void NextGeneration(Grid? currentGrid, Grid? garrisonedGrid) {
+    public void NextGeneration(Grid? currentGrid = null, Grid? garrisonedGrid = null) {
         ++Statistics.Generation; // Let's increment the generation
         Statistics.Day = 0;
         Statistics.CellsAlive = 0;
@@ -104,10 +111,11 @@ public class MainWorld : Service {
 
         // Determine the top 10 cells
         // [1 ...] = LifeCell;
-        LifeCell[] leaderboard = new LifeCell[10];
+        List<LifeCell> leaderboard = new List<LifeCell>();
 
-        if (currentGrid != null) {
-
+        if ((currentGrid != null) && (garrisonedGrid != null)) {
+            updateLeaderboard(leaderboard, currentGrid);
+            updateLeaderboard(leaderboard, garrisonedGrid);
         }
 
         // Load all the cells
