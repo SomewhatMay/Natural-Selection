@@ -1,5 +1,5 @@
 using Microsoft.Xna.Framework;
-using ConstantsNamespace;
+using Constants;
 using System;
 using Classes;
 using Classes.CellObjects;
@@ -54,9 +54,9 @@ public class ScheduleService : Service {
     }
 
     public string[] newSchedule() {
-        string[] Schedule = new string[Constants.ScheduleSize];
+        string[] Schedule = new string[GameConstants.ScheduleSize];
 
-        for (int index = 0; index < Constants.ScheduleSize; ++index) {
+        for (int index = 0; index < GameConstants.ScheduleSize; ++index) {
             Schedule[index] = newRoutine();
         }
 
