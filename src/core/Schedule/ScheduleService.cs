@@ -30,8 +30,7 @@ public class ScheduleService : Service {
         };
     }
 
-    public override void Init(Dictionary<string, Service> loadedServices)
-    {
+    public override void Init(Dictionary<string, Service> loadedServices) {
         base.Init(loadedServices);
 
         mainWorld = (MainWorld) loadedServices["MainWorld"];
