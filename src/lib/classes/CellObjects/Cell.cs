@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System;
 
-using ConstantsNamespace;
+using Constants;
 
 namespace Classes.CellObjects;
 
@@ -29,12 +29,12 @@ public abstract class Cell {
         set { } // we dont want it to be changeable
     }
 
-    private Point drawPosition;
+    public Point drawPosition { get; private set; }
     private Point position;
     public Point Position {
         get { return position; } set { 
             position = value;
-            drawPosition = value * Constants.CellSize;
+            drawPosition = value * GameConstants.CellSize;
             newRectangle();
         }
     }
@@ -59,7 +59,7 @@ public abstract class Cell {
         cellBackground = new Texture2D(graphicsDevice, 1, 1);
 
         this.Position = position ?? new Point(0, 0);
-        this.Size = Constants.CellSize;
+        this.Size = GameConstants.CellSize;
         this.Color = color ?? Color.White;
 
         newRectangle();

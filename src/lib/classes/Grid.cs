@@ -34,21 +34,6 @@ public class Grid {
         cellGrid = new Cell[(int) worldSize.X, (int) worldSize.Y];
     }
 
-    public static int CountNonNull<T>(T[,] array) {
-        int count = 0;
-        for (int i = 0; i < array.GetLength(0); i++)
-        {
-            for (int j = 0; j < array.GetLength(1); j++)
-            {
-                if (array[i, j] != null)
-                {
-                    count++;
-                }
-            }
-        }
-        return count;
-    }
-
     public void Clear() {
         cellList.Clear();
         Array.Clear(cellGrid);
@@ -114,10 +99,10 @@ public class Grid {
         }
     }
 
-    public void IterateExclusiveRegion(IterateExclusiveDelegate callback, int x, int y, int width, int height)
-        => IterateExclusiveRegion(callback, new QuadTreeRect(x, y, width, height));
+    public void IterateExclusiveRegion(int x, int y, int width, int height, IterateExclusiveDelegate callback)
+        => IterateExclusiveRegion(new QuadTreeRect(x, y, width, height), callback);
 
-    public void IterateExclusiveRegion(IterateExclusiveDelegate callback, QuadTreeRect searchArea) {
+    public void IterateExclusiveRegion(QuadTreeRect searchArea, IterateExclusiveDelegate callback) {
         Cell[] cellsInRegion = quadGrid.FindObjects(searchArea);
 
         foreach (Cell cell in cellsInRegion) {

@@ -1,9 +1,9 @@
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 
-namespace ConstantsNamespace;
+namespace Constants;
 
-public static class Constants {
+public static class GameConstants {
     public static int? Seed = null; // can be null, null => random seed
     public static double UpdateRate = .16f; // The rate at which .Next() is called in a cell; in miliseconds
     public static int ScheduleSize = 8; // The size of the schedules each cell has
@@ -30,7 +30,7 @@ public static class Constants {
     public static float ReproductionUnsignedSchedulePercent; // Gets calculated based on the sum of the previous table
 
     public static Point WindowSize = new Point(1300, 1000);
-    public static Point WorldExtents = new Point(50, 50); // number of rows and columns
+    public static Point WorldExtents = new Point(250, 250); // number of rows and columns
     public static int SidebarWidth = 300;
     public static int WorldPixelWidth = WindowSize.X - SidebarWidth;
     public static Point CellSize;
