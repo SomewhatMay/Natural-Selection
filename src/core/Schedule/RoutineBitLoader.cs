@@ -1,5 +1,5 @@
 using System;
-using ConstantsNamespace;
+using Constants;
 
 namespace Core.Schedule;
 
@@ -36,7 +36,7 @@ public static class RoutineBitLoader {
     }
 
     public static string ConnectionPointer() {
-        return gameRandom.Next(0, Constants.ScheduleSize).ToString();
+        return gameRandom.Next(0, GameConstants.ScheduleSize).ToString();
     }
 
     public static string ActionType() {

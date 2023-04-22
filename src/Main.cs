@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System;
 
 using Core.Schedule;
-using ConstantsNamespace;
+using Constants;
 using Classes;
 using Core;
 
@@ -27,28 +27,26 @@ public class NaturalSelection : Game
     }
 
     public NaturalSelection() {
+        // initialize the constants 
+        GameConstants.Initialize();
+
         _graphics = new GraphicsDeviceManager(this);
-        _graphics.PreferredBackBufferWidth = Constants.WindowSize.X;
-        _graphics.PreferredBackBufferHeight = Constants.WindowSize.Y;
+        _graphics.PreferredBackBufferWidth = GameConstants.WindowSize.X;
+        _graphics.PreferredBackBufferHeight = GameConstants.WindowSize.Y;
         _graphics.SynchronizeWithVerticalRetrace = false;
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
 
         this.IsFixedTimeStep = false;
 
-        if (Constants.Seed == null) {
-            gameRandom = new Random();
-        } else {
-            gameRandom = new Random((int) Constants.Seed);
-        }
-
-        // initialize the constants 
-        Constants.Initialize();
+        gameRandom = new Random((int) GameConstants.Seed);
 
         // let's load all the services
         loadedServices = new Dictionary<string, Service>();
         LoadService("MainWorld", new MainWorld(this, gameRandom));
         LoadService("Schedule", new ScheduleService(this, gameRandom));
+
+        Console.WriteLine($"Starting game with Seed {GameConstants.Seed}");
     }
 
     protected override void Initialize() {

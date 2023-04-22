@@ -9,7 +9,7 @@ using NaturalSelectionRemastered;
 using Classes.GameGrid;
 using Classes;
 using Classes.CellObjects;
-using ConstantsNamespace;
+using Constants;
 using System.Collections.Generic;
 using Core.Schedule;
 using Other;
@@ -50,7 +50,7 @@ public class MainWorld : Service {
     ScheduleService scheduleService;
 
     // Create a 2D array for all the cells that will be repasted. Loading on stack so garbage collector doesnt get mad lol
-    Cell?[,] repastableCells = new Cell?[Constants.WorldExtents.X, Constants.WorldExtents.Y];
+    Cell?[,] repastableCells = new Cell?[GameConstants.WorldExtents.X, GameConstants.WorldExtents.Y];
 
     #nullable disable
     public MainWorld(Game game, Random gameRandom) : base(game) {
@@ -60,7 +60,7 @@ public class MainWorld : Service {
         lastUpdate = new DifferenceTime();
         generationElapsedTime = new DifferenceTime();
 
-        gameGrid = new Grid(Constants.WorldExtents);
+        gameGrid = new Grid(GameConstants.WorldExtents);
         this.garrisonedCells = new List<Cell>();
     }
 
@@ -151,9 +151,9 @@ public class MainWorld : Service {
         // Load all the cells
         #nullable enable
         gameGrid.FillGrid((int x, int y) => {
-            int chance = gameRandom.Next(0, Constants.ChanceMax);
+            int chance = gameRandom.Next(0, GameConstants.ChanceMax);
 
-            if (Constants.LifeCellRandomValues.Contains(chance)) {
+            if (GameConstants.LifeCellRandomValues.Contains(chance)) {
                 ++Statistics.CellsAlive;
                 LifeCell lifeCell = new LifeCell(
                     new Point(x, y)
@@ -164,14 +164,14 @@ public class MainWorld : Service {
                     float chosenAncestryPercent = gameRandom.Next(0, 100) / 100f;
 
                     // Let's ensure our cell's ancestry does not land in the UnsignedSchedule percent 
-                    if (chosenAncestryPercent <= Constants.ReproductionUnsignedSchedulePercent) {
+                    if (chosenAncestryPercent <= GameConstants.ReproductionUnsignedSchedulePercent) {
                         LifeCell? chosenCell = null;
 
-                        for (int rank = 0; rank < Constants.ReproductionPercentDictionary.Count; ++rank) {
+                        for (int rank = 0; rank < GameConstants.ReproductionPercentDictionary.Count; ++rank) {
                             // We know that the 0th item in the leaderboard doesnt have anything before it so we set the minimum value to -1 instead
                             // The reason it's -1 is because the if statement later checks if it is greater than minPercent
-                            float minPercent = ((rank == 0) ? -1 : Constants.ReproductionPercentDictionary[rank - 1]);
-                            float percent = Constants.ReproductionPercentDictionary[rank];
+                            float minPercent = ((rank == 0) ? -1 : GameConstants.ReproductionPercentDictionary[rank - 1]);
+                            float percent = GameConstants.ReproductionPercentDictionary[rank];
 
                             if (chosenAncestryPercent > minPercent && chosenAncestryPercent <= percent) {
                                 chosenCell = leaderboard[rank];
@@ -187,7 +187,7 @@ public class MainWorld : Service {
                 }
 
                 return lifeCell;
-            } else if (Constants.FoodCellRandomValues.Contains(chance)) {
+            } else if (GameConstants.FoodCellRandomValues.Contains(chance)) {
                 ++Statistics.FoodAlive;
                 Cell foodCell = new FoodCell(
                     new Point(x, y)
@@ -239,7 +239,7 @@ public class MainWorld : Service {
                             repastableCells[garrisonedCell.Position.X, garrisonedCell.Position.Y] = null;
                         }
 
-                        garrisonedCell.Points += Constants.RewardSetting.Death;
+                        garrisonedCell.Points += GameConstants.RewardSetting.Death;
                         garrisonedCell.Alive = false;
 
                         ++Statistics.CellsGarrisoned;
@@ -298,9 +298,11 @@ public class MainWorld : Service {
         Keyboard.GetState();
         if (Keyboard.HasClicked(Microsoft.Xna.Framework.Input.Keys.G)) {
             NextGeneration(gameGrid, garrisonedCells);
+        } else if (Keyboard.HasClicked(Microsoft.Xna.Framework.Input.Keys.N)) {
+            NextGeneration();
         }
 
-        if (lastUpdate.Calculate() >= Constants.UpdateRate) {
+        if (lastUpdate.Calculate() >= GameConstants.UpdateRate) {
 
             NextDay();
 
