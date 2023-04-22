@@ -23,11 +23,11 @@ public class Move : IAction {
         Point directionOffset;
 
         if (direction == 0) {
-            directionOffset = new Point(0, 1);
+            directionOffset = new Point(0, -1);
         } else if (direction == 1) {
             directionOffset = new Point(1, 0);
         } else if (direction == 2) {
-            directionOffset = new Point(0, -1);
+            directionOffset = new Point(0, 1);
         } else { // if (direction == 3) {
             directionOffset = new Point(-1, 0);
         }

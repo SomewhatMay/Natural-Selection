@@ -94,6 +94,7 @@ public class Grid {
 
             // if we cannot continue, we break
             if (!result) {
+                Console.WriteLine("Breaking!");
                 break;
             }
         }

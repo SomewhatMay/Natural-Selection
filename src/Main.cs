@@ -27,6 +27,9 @@ public class NaturalSelection : Game
     }
 
     public NaturalSelection() {
+        // initialize the constants 
+        GameConstants.Initialize();
+
         _graphics = new GraphicsDeviceManager(this);
         _graphics.PreferredBackBufferWidth = GameConstants.WindowSize.X;
         _graphics.PreferredBackBufferHeight = GameConstants.WindowSize.Y;
@@ -36,19 +39,14 @@ public class NaturalSelection : Game
 
         this.IsFixedTimeStep = false;
 
-        if (GameConstants.Seed == null) {
-            gameRandom = new Random();
-        } else {
-            gameRandom = new Random((int) GameConstants.Seed);
-        }
-
-        // initialize the constants 
-        GameConstants.Initialize();
+        gameRandom = new Random((int) GameConstants.Seed);
 
         // let's load all the services
         loadedServices = new Dictionary<string, Service>();
         LoadService("MainWorld", new MainWorld(this, gameRandom));
         LoadService("Schedule", new ScheduleService(this, gameRandom));
+
+        Console.WriteLine($"Starting game with Seed {GameConstants.Seed}");
     }
 
     protected override void Initialize() {

@@ -1,18 +1,19 @@
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using System;
 
 namespace Constants;
 
 public static class GameConstants {
-    public static int? Seed = null; // can be null, null => random seed
-    public static double UpdateRate = .16f; // The rate at which .Next() is called in a cell; in miliseconds
+    public static int? Seed = null; // can be null, null => random seed // 997541150
+    public static double UpdateRate = 0.16f; // The rate at which .Next() is called in a cell; in miliseconds
     public static int ScheduleSize = 8; // The size of the schedules each cell has
     public static float MutationChance = 0.4f; // The chance that the next cell generation mutates 
-    public static int ChanceMax = 150; // the max value put in when calculating the number of cells to be generated
+    public static int ChanceMax = 100; // the max value put in when calculating the number of cells to be generated
 
     // The values to watch for when determining which cell to spawn
     public static int[] LifeCellRandomValues = new int[1] { 1 };
-    public static int[] FoodCellRandomValues = new int[2] { 2 , 3 };
+    public static int[] FoodCellRandomValues = new int[3] { 2 , 3 , 4 };
 
     // This will be used to determine the chance of cell reproduction based on their ranks
     public static Dictionary<int, float> ReproductionPercentDictionary = new Dictionary<int, float> {
@@ -30,7 +31,7 @@ public static class GameConstants {
     public static float ReproductionUnsignedSchedulePercent; // Gets calculated based on the sum of the previous table
 
     public static Point WindowSize = new Point(1300, 1000);
-    public static Point WorldExtents = new Point(250, 250); // number of rows and columns
+    public static Point WorldExtents = new Point(50, 50); // number of rows and columns
     public static int SidebarWidth = 300;
     public static int WorldPixelWidth = WindowSize.X - SidebarWidth;
     public static Point CellSize;
@@ -42,6 +43,10 @@ public static class GameConstants {
 
     // use this method to change any constants that need to be calculated in runtime 
     public static void Initialize() {
+        if (Seed == null) {
+            Seed = new Random().Next();
+        }
+
         CellSize = new Point(
             WorldPixelWidth / WorldExtents.X,
             WindowSize.Y / WorldExtents.Y

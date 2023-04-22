@@ -298,6 +298,8 @@ public class MainWorld : Service {
         Keyboard.GetState();
         if (Keyboard.HasClicked(Microsoft.Xna.Framework.Input.Keys.G)) {
             NextGeneration(gameGrid, garrisonedCells);
+        } else if (Keyboard.HasClicked(Microsoft.Xna.Framework.Input.Keys.N)) {
+            NextGeneration();
         }
 
         if (lastUpdate.Calculate() >= GameConstants.UpdateRate) {
