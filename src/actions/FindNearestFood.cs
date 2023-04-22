@@ -24,12 +24,12 @@ public class FindNearestFood : IAction {
         FoodCell? closestCell = null;
         float distanceToClosestCell = float.MaxValue;
 
-        gameGrid.IterateExclusiveAll(
-            // cell.Position.X - ActionConstants.FindNearestFood.SearchBoundsPositionOffset.X,
-            // cell.Position.Y - ActionConstants.FindNearestFood.SearchBoundsPositionOffset.Y,
+        gameGrid.IterateExclusiveRegion(
+            cell.Position.X - ActionConstants.FindNearestFood.SearchBoundsPositionOffset.X,
+            cell.Position.Y - ActionConstants.FindNearestFood.SearchBoundsPositionOffset.Y,
 
-            // ActionConstants.FindNearestFood.SearchBounds.X,
-            // ActionConstants.FindNearestFood.SearchBounds.Y,
+            ActionConstants.FindNearestFood.SearchBounds.X,
+            ActionConstants.FindNearestFood.SearchBounds.Y,
 
             // The delegate that finds the nearest cell
             (Cell iteratingCell) => {
@@ -55,10 +55,10 @@ public class FindNearestFood : IAction {
 
                 // If the closest cell is within 1 square, we know that that is the closest a cell can be.
                 // Therefore, we can exit out of the loop
-                // if (Math.Floor(distanceToCurrentCell) <= 1f) {
-                //     Console.WriteLine("Distance less than 1");
-                //     return false;
-                // }
+                if (Math.Floor(distanceToIteratingCell) <= 1f) {
+                    //Console.WriteLine("Distance less than 1");
+                    return false;
+                }
 
                 return true;
             }
@@ -80,9 +80,9 @@ public class FindNearestFood : IAction {
                 direction = (yOffset < 0) ? 0 : 2;
             }
 
-            Console.WriteLine($"Found cell at {closestCell.Position.ToString()}, currently at {cell.Position.ToString()}. Offsets: ({xOffset}, {yOffset}) - Moving at direction {direction}");
+            //Console.WriteLine($"Found cell at {closestCell.Position.ToString()}, currently at {cell.Position.ToString()}. Offsets: ({xOffset}, {yOffset}) - Moving at direction {direction}");
         } else {
-            Console.WriteLine($"No closest cell found at XY: ({cell.Position.X - ActionConstants.FindNearestFood.SearchBoundsPositionOffset.X}, {cell.Position.Y - ActionConstants.FindNearestFood.SearchBoundsPositionOffset.Y})  with size  XY: ({ActionConstants.FindNearestFood.SearchBounds.X}, {ActionConstants.FindNearestFood.SearchBounds.Y}) ");
+            //Console.WriteLine($"No closest cell found at XY: ({cell.Position.X - ActionConstants.FindNearestFood.SearchBoundsPositionOffset.X}, {cell.Position.Y - ActionConstants.FindNearestFood.SearchBoundsPositionOffset.Y})  with size  XY: ({ActionConstants.FindNearestFood.SearchBounds.X}, {ActionConstants.FindNearestFood.SearchBounds.Y}) ");
         }
 
         return direction;

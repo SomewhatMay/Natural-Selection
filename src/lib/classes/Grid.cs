@@ -12,10 +12,10 @@ public delegate bool IterateExclusiveDelegate(Cell cell);
 public delegate Cell? FillDelegate(int X, int Y);
 
 public class CellBounds : IQuadTreeObjectBounds<Cell> {
-    public float GetBottom(Cell obj) => obj.Bounds.Bottom;
-    public float GetTop(Cell obj) => obj.Bounds.Top;
-    public float GetLeft(Cell obj) => obj.Bounds.Left;
-    public float GetRight(Cell obj) => obj.Bounds.Right;
+    public float GetBottom(Cell obj) => obj.Position.Y;
+    public float GetTop(Cell obj) => obj.Position.Y;
+    public float GetLeft(Cell obj) => obj.Position.X;
+    public float GetRight(Cell obj) => obj.Position.X;
 }
 
 public class Grid {
@@ -94,17 +94,19 @@ public class Grid {
 
             // if we cannot continue, we break
             if (!result) {
-                Console.WriteLine("Breaking!");
+                //Console.WriteLine("Breaking!");
                 break;
             }
         }
     }
 
     public void IterateExclusiveRegion(int x, int y, int width, int height, IterateExclusiveDelegate callback)
-        => IterateExclusiveRegion(new QuadTreeRect(x, y, width, height), callback);
+        => IterateExclusiveRegion(new QuadTreeRect((float) x, (float) y, (float) width, (float) height), callback);
 
     public void IterateExclusiveRegion(QuadTreeRect searchArea, IterateExclusiveDelegate callback) {
         Cell[] cellsInRegion = quadGrid.FindObjects(searchArea);
+
+        //Console.WriteLine($"Got {cellsInRegion.Length} in area");
 
         foreach (Cell cell in cellsInRegion) {
             bool result = callback(cell);

@@ -5,11 +5,11 @@ using System;
 namespace Constants;
 
 public static class GameConstants {
-    public static int? Seed = null; // can be null, null => random seed // 997541150
-    public static double UpdateRate = 0.16f; // The rate at which .Next() is called in a cell; in miliseconds
+    public static int? Seed = 936864398; // can be null, null => random seed // 936864398
+    public static double UpdateRate = 0f; // The rate at which .Next() is called in a cell; in miliseconds
     public static int ScheduleSize = 8; // The size of the schedules each cell has
     public static float MutationChance = 0.4f; // The chance that the next cell generation mutates 
-    public static int ChanceMax = 100; // the max value put in when calculating the number of cells to be generated
+    public static int ChanceMax = 250; // the max value put in when calculating the number of cells to be generated
 
     // The values to watch for when determining which cell to spawn
     public static int[] LifeCellRandomValues = new int[1] { 1 };
@@ -31,7 +31,7 @@ public static class GameConstants {
     public static float ReproductionUnsignedSchedulePercent; // Gets calculated based on the sum of the previous table
 
     public static Point WindowSize = new Point(1300, 1000);
-    public static Point WorldExtents = new Point(50, 50); // number of rows and columns
+    public static Point WorldExtents = new Point(500, 500); // number of rows and columns
     public static int SidebarWidth = 300;
     public static int WorldPixelWidth = WindowSize.X - SidebarWidth;
     public static Point CellSize;
