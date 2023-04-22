@@ -6,12 +6,16 @@ using Classes.CellObjects;
 using Other;
 using Interfaces;
 using Actions;
+using Core;
+using System.Collections.Generic;
 
 namespace Core.Schedule;
 
 public class ScheduleService : Service {
     Random gameRandom;
     IAction[] Actions;
+
+    MainWorld mainWorld;
 
     public ScheduleService(Game game, Random gameRandom) : base(game) {
         this.gameRandom = gameRandom;
@@ -20,13 +24,23 @@ public class ScheduleService : Service {
         Evaluators.Init();
 
         // Load all actions
-        Actions = new IAction[1] {
+        Actions = new IAction[2] {
             new Move(),
+            new FindNearestFood(),
         };
+    }
+
+    public override void Init(Dictionary<string, Service> loadedServices)
+    {
+        base.Init(loadedServices);
+
+        mainWorld = (MainWorld) loadedServices["MainWorld"];
     }
 
     public override void LoadContent() {
         // Lets init any actions that may need to be initiated
+        
+        FindNearestFood.Init(mainWorld.GameGrid);
     }
 
     public string newRoutine() {

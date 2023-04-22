@@ -36,6 +36,12 @@ public class MainWorld : Service {
     List<Cell> garrisonedCells;
     SpriteBatch spriteBatch;
 
+    // lets make it so we have an access to the gamegrid from outside
+    // but no one else can set it 
+    public Grid GameGrid {
+        get { return gameGrid; } private set { }
+    }
+
     Random gameRandom;
 
     DifferenceTime lastUpdate;
@@ -53,6 +59,9 @@ public class MainWorld : Service {
 
         lastUpdate = new DifferenceTime();
         generationElapsedTime = new DifferenceTime();
+
+        gameGrid = new Grid(Constants.WorldExtents);
+        this.garrisonedCells = new List<Cell>();
     }
 
     public override void Init(Dictionary<string, Service> loadedServices) {
@@ -68,9 +77,6 @@ public class MainWorld : Service {
         Cell.Load(this.game.GraphicsDevice, loadedServices);
         spriteBatch = new SpriteBatch(this.game.GraphicsDevice);
 
-        gameGrid = new Grid(Constants.WorldExtents);
-        this.garrisonedCells = new List<Cell>();
-
         NextGeneration();
     }
 
@@ -79,14 +85,14 @@ public class MainWorld : Service {
             return false;
         } else {
             // Lets move to the next generation if all the food is finished!
-            NextGeneration();
-            
+            NextGeneration(gameGrid, garrisonedCells);
+
             return true;
         }
     }
 
-    private void updateLeaderboard(List<LifeCell> leaderboard, Grid currentGrid) {
-        currentGrid.IterateExclusiveAll((Cell cell) => {
+    private void updateLeaderboard(List<LifeCell> leaderboard, List<Cell> currentGrid) {
+        foreach (Cell cell in currentGrid) {
             if (cell is LifeCell) {
                 LifeCell currentCell = (LifeCell) cell;
 
@@ -117,12 +123,10 @@ public class MainWorld : Service {
                     }
                 }
             }
-            
-            return true;
-        });
+        }
     }
 
-    public void NextGeneration(Grid? currentGrid = null, Grid? garrisonedGrid = null) {
+    public void NextGeneration(Grid? currentGrid = null, List<Cell>? garrisonedGrid = null) {
         ++Statistics.Generation; // Let's increment the generation
         Statistics.Day = 0;
         Statistics.CellsAlive = 0;
@@ -135,7 +139,7 @@ public class MainWorld : Service {
         List<LifeCell> leaderboard = new List<LifeCell>();
 
         if ((currentGrid != null) && (garrisonedGrid != null)) {
-            updateLeaderboard(leaderboard, currentGrid);
+            updateLeaderboard(leaderboard, currentGrid.cellList);
             updateLeaderboard(leaderboard, garrisonedGrid);
 
             Console.WriteLine($"New generation started! Last generation took {generationElapsedTime.Calculate()} ms!");
