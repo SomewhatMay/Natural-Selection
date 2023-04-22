@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System;
 
-using Core.ScheduleService;
+using Core.Schedule;
 using ConstantsNamespace;
 using Classes;
 using Core;
@@ -34,8 +34,6 @@ public class NaturalSelection : Game
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
 
-        _graphics.ApplyChanges();
-
         this.IsFixedTimeStep = false;
 
         if (Constants.Seed == null) {
@@ -54,6 +52,7 @@ public class NaturalSelection : Game
     }
 
     protected override void Initialize() {
+        _graphics.ApplyChanges();
         // TODO: Add your initialization logic here
 
         // let's call initialize after all services are loaded
@@ -74,7 +73,7 @@ public class NaturalSelection : Game
     }
 
     protected override void Update(GameTime gameTime) {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Microsoft.Xna.Framework.Input.Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
         // TODO: Add your update logic here

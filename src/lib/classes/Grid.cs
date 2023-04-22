@@ -34,6 +34,21 @@ public class Grid {
         cellGrid = new Cell[(int) worldSize.X, (int) worldSize.Y];
     }
 
+    public static int CountNonNull<T>(T[,] array) {
+        int count = 0;
+        for (int i = 0; i < array.GetLength(0); i++)
+        {
+            for (int j = 0; j < array.GetLength(1); j++)
+            {
+                if (array[i, j] != null)
+                {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
     public void Clear() {
         cellList.Clear();
         Array.Clear(cellGrid);
@@ -44,7 +59,7 @@ public class Grid {
         // Check if there is already a cell in a specific position
         Cell? currentValue = GetInGrid(cell.Position.X, cell.Position.Y);
         if (currentValue != null) {
-            throw new System.Exception("Cannot overwrite a grid field that already has a cell");
+            throw new System.Exception($"Cannot overwrite a grid field that already has a cell. Current Cell Type:{currentValue.GetType()}. New cell:{cell.GetType()}");
         }
 
         cellList.Add(cell);
@@ -52,7 +67,15 @@ public class Grid {
         cellGrid[cell.Position.X, cell.Position.Y] = cell;
     }
 
+    public Cell GetInGrid(Vector2 position) => GetInGrid((int) position.X, (int) position.Y);
+    public Cell GetInGrid(Point position) => GetInGrid(position.X, position.Y);
     public Cell GetInGrid(int X, int Y) {
+        // try {
+        //     var cellGrid[X, Y];
+        // } catch (System.IndexOutOfRangeException) {
+        //     Console.WriteLine($"Index out of range: ({X}, {Y})");
+        // }
+
         return cellGrid[X, Y];
     }
 
