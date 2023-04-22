@@ -142,7 +142,7 @@ public class MainWorld : Service {
             updateLeaderboard(leaderboard, currentGrid.cellList);
             updateLeaderboard(leaderboard, garrisonedGrid);
 
-            Console.WriteLine($"New generation started! Last generation took {generationElapsedTime.Calculate()} ms!");
+            Console.WriteLine($"New generation started! Last generation took {generationElapsedTime.Calculate(true)} seconds!");
         }
 
         // Empty the grid
@@ -198,6 +198,8 @@ public class MainWorld : Service {
 
             return null;
         });
+
+        generationElapsedTime.Start();
     }
 
     public void NextDay() {
@@ -293,6 +295,11 @@ public class MainWorld : Service {
     }
 
     public override void Update(GameTime gameTime) {
+        Keyboard.GetState();
+        if (Keyboard.HasClicked(Microsoft.Xna.Framework.Input.Keys.G)) {
+            NextGeneration(gameGrid, garrisonedCells);
+        }
+
         if (lastUpdate.Calculate() >= Constants.UpdateRate) {
 
             NextDay();

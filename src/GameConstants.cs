@@ -30,7 +30,7 @@ public static class Constants {
     public static float ReproductionUnsignedSchedulePercent; // Gets calculated based on the sum of the previous table
 
     public static Point WindowSize = new Point(1300, 1000);
-    public static Point WorldExtents = new Point(200, 200); // number of rows and columns
+    public static Point WorldExtents = new Point(500, 500); // number of rows and columns
     public static int SidebarWidth = 300;
     public static int WorldPixelWidth = WindowSize.X - SidebarWidth;
     public static Point CellSize;

@@ -105,7 +105,7 @@ public class ScheduleService : Service {
     }
 
     public void MutateCell(LifeCell cell, string[] targetSchedule) {
-
+        cell.Schedule = targetSchedule;
     }
 
     private int wrap(int number, int max) {
