@@ -32,6 +32,7 @@ internal class TextLabel : GraphicalInstance
 		}
 	}
 
+	private Point drawOffset;
 	private Point textPosition;
 
 	public Color TextColor;
@@ -74,9 +75,14 @@ internal class TextLabel : GraphicalInstance
 		Console.WriteLine($"Alligned text with {Allignment} with position {textPosition.ToString()}");
 	}
 
+	protected override void OffsetChanged(Point newOffset)
+	{
+		drawOffset = newOffset;
+	}
+
 	public override void Draw(SpriteBatch spriteBatch)
 	{
-		spriteBatch.DrawString(NaturalSelection.TextFont, Text, textPosition.ToVector2(), TextColor);
+		spriteBatch.DrawString(NaturalSelection.TextFont, Text, drawOffset.ToVector2() + textPosition.ToVector2(), TextColor);
 	}
 
 }

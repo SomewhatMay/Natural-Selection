@@ -53,7 +53,7 @@ public class NaturalSelection : Game
 		LoadService("Graphics", new GraphicsService(this));
 		LoadService("Sidebar", new SidebarService(this));
 
-		Console.WriteLine($"Starting game with Seed {GameConstants.Seed}");
+		Console.WriteLine($"Starting Natural Selection [REMASTERED v{GameConstants.version}] with Seed {GameConstants.Seed}");
 	}
 
 	protected override void Initialize()

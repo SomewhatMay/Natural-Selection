@@ -21,7 +21,7 @@ public class Frame : GraphicalInstance
 	}
 
 #nullable enable
-	public Frame(Point position, Point size, GraphicalInstance? parent = null) : this(position, size, Color.White, parent) { }
+	public Frame(Point position, Point size, GraphicalInstance parent) : this(position, size, Color.White, parent) { }
 	public Frame(Point position, Point size, Color? backgroundColor = null, GraphicalInstance? parent = null) : base(position, size, parent)
 	{
 		cellBackground = new Texture2D(graphicsDevice, 1, 1);
