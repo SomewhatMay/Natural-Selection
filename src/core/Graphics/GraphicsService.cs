@@ -22,11 +22,11 @@ public class GraphicsService : Service {
         GraphicalInstance.Load(game.GraphicsDevice, loadedServices);
     }
 
-    public int AddInstance(GraphicalInstance newInstance) {
+    public GraphicalInstance AddInstance(GraphicalInstance newInstance) {
         graphicalInstances[graphicalInstancesIndex] = newInstance;
         ++graphicalInstancesIndex;
 
-        return graphicalInstancesIndex;
+        return newInstance;
     }
 
     // Returns whether it successfully removed the instance or not
@@ -44,6 +44,10 @@ public class GraphicsService : Service {
 
     public void RemoveInstance(int instanceIndex) {
         graphicalInstances[instanceIndex] = null;
+    }
+
+    public override void Update(GameTime gameTime) {
+        GraphicalInstance.FrameCheck(gameTime);
     }
 
     public override void Draw(GameTime game) {

@@ -37,5 +37,7 @@ public class SidebarService : Service {
         ));
         graphicsService.AddInstance(children["Sidebar background"]);
         graphicsService.AddInstance(children["Test inside background"]);
+
+        children["Sidebar background"].MakeClickableInstance();
     }
 }
