@@ -16,7 +16,10 @@ public class Frame : GraphicalInstance {
         }
     }
 
-    public Frame(Point position, Point size) : base(position, size) {
+    #nullable enable
+    public Frame(Point position, Point size, Color? backgroundColor = null, GraphicalInstance? parent = null) : base(position, size, parent) {
+        cellBackground = new Texture2D(graphicsDevice, 1, 1);
+        this.BackgroundColor = backgroundColor ?? Color.White;
         newRectangle();
     }
 

@@ -1,8 +1,7 @@
-#nullable enable
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System;
 using Classes;
 
 namespace GUI;
@@ -34,31 +33,61 @@ public abstract class GraphicalInstance {
         }
     }
 
+    #nullable enable
     protected Point drawOffset;
-    private Dictionary<int, GraphicalInstance> children;
+    private Dictionary<int, GraphicalInstance>? children;
+    private int nextChildAddIndex = 0;
+    private GraphicalInstance? parent;
+    private int? childIndexInparent;
 
+    #nullable disable
+    public GraphicalInstance Parent {
+        get { return parent; } set {
+            if (parent != null) {
+                parent.RemoveChild((int) childIndexInparent);
+            }
+
+            if (value == null) {
+                throw new System.Exception("Attempted to parent object to null");
+            } else {
+                parent = value;
+                childIndexInparent = value.AddChild(this);
+                OffsetChanged(value.Position);
+
+                Console.WriteLine($"Changed parent of {this} to {value}");
+            }
+        }
+    }
+
+    #nullable enable
     protected GraphicalInstance() : this(new Point(0, 0), new Point(50, 50), true) { }
     protected GraphicalInstance(Point position) : this(position, new Point(50, 50), true) { }
     protected GraphicalInstance(Point position, Point size) : this(position, size, true) { }
-    protected GraphicalInstance(Point position, Point size, bool visible) {
+    protected GraphicalInstance(Point position, Point size, GraphicalInstance? parent) : this(position, size, true, parent) { }
+    protected GraphicalInstance(Point position, Point size, bool visible, GraphicalInstance? parent = null) {
+        children = new Dictionary<int, GraphicalInstance>();
+        
         this.Position = position;
         this.Size = size;
         this.Visible = visible;
 
-        children = new Dictionary<int, GraphicalInstance>();
+        if (parent != null) {
+            this.Parent = parent;
+        }
     }
-
-    private int nextChildAddIndex = 0;
-    //@return - returns the index at which the child was added to
-    public int AddChild(GraphicalInstance child) {
+    
+    #nullable disable
+    // Should never be called! Only change the object's parent!
+    protected int AddChild(GraphicalInstance child) {
         children[nextChildAddIndex] = child;
         ++nextChildAddIndex;
 
         return nextChildAddIndex - 1;
     }
 
-    public void RemoveChild(int index) {
-        children.Remove(index);
+    // Should never be called! Only change the object's parent!
+    protected void RemoveChild(int index) {
+        children[index] = null;
     }
 
     private void UpdateAllChildrenOffsets() {

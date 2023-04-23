@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System;
 
+using Core.Graphics;
 using Core.Schedule;
 using Constants;
 using Classes;
@@ -45,6 +46,8 @@ public class NaturalSelection : Game
         loadedServices = new Dictionary<string, Service>();
         LoadService("MainWorld", new MainWorld(this, gameRandom));
         LoadService("Schedule", new ScheduleService(this, gameRandom));
+        LoadService("Graphics", new GraphicsService(this));
+        LoadService("Sidebar", new SidebarService(this));
 
         Console.WriteLine($"Starting game with Seed {GameConstants.Seed}");
     }
