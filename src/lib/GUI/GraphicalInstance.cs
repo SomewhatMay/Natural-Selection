@@ -97,6 +97,7 @@ public abstract class GraphicalInstance
 	}
 
 #nullable enable
+	public string Name;
 	protected Point drawOffset;
 	private Dictionary<int, GraphicalInstance>? children;
 	private int nextChildAddIndex = 0;
@@ -122,10 +123,7 @@ public abstract class GraphicalInstance
 			{
 				parent = value;
 				childIndexInparent = value.AddChild(this);
-				OffsetChanged(value.Position);
-
-				Console.WriteLine($"Changed parent of {this} to {value}");
-			}
+				OffsetChanged(value.Position + value.drawOffset);
 		}
 	}
 
@@ -136,6 +134,7 @@ public abstract class GraphicalInstance
 	protected GraphicalInstance(Point position, Point size, GraphicalInstance? parent) : this(position, size, true, parent) { }
 	protected GraphicalInstance(Point position, Point size, bool visible, GraphicalInstance? parent = null)
 	{
+		Name = "GraphicalInstance";
 		children = new Dictionary<int, GraphicalInstance>();
 
 		this.Position = position;
@@ -188,15 +187,18 @@ public abstract class GraphicalInstance
 
 	private void UpdateAllChildrenOffsets()
 	{
+		Point totalOffset = this.Position + this.drawOffset;
+
 		foreach (var (index, child) in children)
 		{
-			child.OffsetChanged(Position);
+			child.OffsetChanged(totalOffset);
 		}
 	}
 
 	protected virtual void OffsetChanged(Point newOffset)
 	{
 		this.drawOffset = newOffset;
+		UpdateAllChildrenOffsets();
 	}
 
 	public void SetOnClicked(onClickedDelegate callback)

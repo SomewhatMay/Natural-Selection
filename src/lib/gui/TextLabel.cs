@@ -32,7 +32,6 @@ internal class TextLabel : GraphicalInstance
 		}
 	}
 
-	private Point drawOffset;
 	private Point textPosition;
 
 	public Color TextColor;
@@ -55,6 +54,7 @@ internal class TextLabel : GraphicalInstance
 		this.Allignment = TextAllignment.LEFT;
 		this.Text = text;
 		this.TextColor = Color.White;
+		this.Name = "TextLabel";
 	}
 
 	private void updateAllignment() {
@@ -71,8 +71,6 @@ internal class TextLabel : GraphicalInstance
 			textPosition = (new Point(Size.X - TextSize.X, 0)) + Position;
 		}
 		else throw new NotImplementedException($"Not implemented allignment mode{Allignment}");
-
-		Console.WriteLine($"Alligned text with {Allignment} with position {textPosition.ToString()}");
 	}
 
 	protected override void OffsetChanged(Point newOffset)

@@ -10,7 +10,7 @@ using System;
 namespace Core.Graphics;
 
 public class SceneInfo {
-	private static Point startingPosition = new Point(10, 15);
+	private static Point startingPosition = new Point(10, 25);
 
 	private Dictionary<string, GraphicalInstance> children;
 
@@ -33,17 +33,18 @@ public class SceneInfo {
 		// Load all the objects needed
 		Frame background = new Frame(
 				startingPosition,
-				new Point(GameConstants.SidebarWidth - 20, 300),
-				null
+				new Point(GameConstants.SidebarWidth - 20, 300)
 		);
 		background.Parent = sidebarFrame;
+		background.Name = "scene Info background";
 
 		TextLabel title = new TextLabel(
 			new Point(20, 10),
 			new Point(background.Size.X - 10, 15),
 			"Scene Info"
 		);
-		//title.Parent = background;
+		title.Name = "Scene Info Title";
+		title.Parent = background;
 		title.TextColor = Color.Black;
 
 		children.Add("Background", background);

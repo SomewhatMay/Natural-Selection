@@ -27,6 +27,7 @@ public class Frame : GraphicalInstance
 		cellBackground = new Texture2D(graphicsDevice, 1, 1);
 		this.BackgroundColor = backgroundColor ?? Color.White;
 		newRectangle();
+		this.Name = "Frame";
 	}
 
 	public override void Draw(SpriteBatch spriteBatch)
@@ -36,9 +37,8 @@ public class Frame : GraphicalInstance
 
 	protected override void OffsetChanged(Point newOffset)
 	{
-		newRectangle();
-
 		base.OffsetChanged(newOffset);
+		newRectangle();
 	}
 
 	private void newRectangle()
