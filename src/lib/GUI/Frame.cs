@@ -4,36 +4,44 @@ using System.Collections.Generic;
 
 namespace GUI;
 
-public class Frame : GraphicalInstance {
-    private Rectangle rectangle;
-    protected Texture2D cellBackground;
+public class Frame : GraphicalInstance
+{
+	private Rectangle rectangle;
+	protected Texture2D cellBackground;
 
-    private Color backgroundColor;
-    public Color BackgroundColor {
-        get { return backgroundColor; } set {
-            backgroundColor = value;
-            this.cellBackground.SetData(new[] { value });
-        }
-    }
+	private Color backgroundColor;
+	public Color BackgroundColor
+	{
+		get { return backgroundColor; }
+		set
+		{
+			backgroundColor = value;
+			this.cellBackground.SetData(new[] { value });
+		}
+	}
 
-    #nullable enable
-    public Frame(Point position, Point size, Color? backgroundColor = null, GraphicalInstance? parent = null) : base(position, size, parent) {
-        cellBackground = new Texture2D(graphicsDevice, 1, 1);
-        this.BackgroundColor = backgroundColor ?? Color.White;
-        newRectangle();
-    }
+	#nullable enable
+	public Frame(Point position, Point size, Color? backgroundColor = null, GraphicalInstance? parent = null) : base(position, size, parent)
+	{
+		cellBackground = new Texture2D(graphicsDevice, 1, 1);
+		this.BackgroundColor = backgroundColor ?? Color.White;
+		newRectangle();
+	}
 
-    public override void Draw(SpriteBatch spriteBatch) {
-        spriteBatch.Draw(this.cellBackground, this.rectangle, this.BackgroundColor);
-    }
+	public override void Draw(SpriteBatch spriteBatch)
+	{
+		spriteBatch.Draw(this.cellBackground, this.rectangle, this.BackgroundColor);
+	}
 
-    protected override void OffsetChanged(Point newOffset) {
-        newRectangle();
+	protected override void OffsetChanged(Point newOffset)
+	{
+		newRectangle();
 
-        base.OffsetChanged(newOffset);
-    }
+		base.OffsetChanged(newOffset);
+	}
 
-    private void newRectangle() {
-        rectangle = new Rectangle(this.drawPosition + this.drawOffset, this.Size);
-    }
+	private void newRectangle()
+	{
+		rectangle = new Rectangle(this.drawPosition + this.drawOffset, this.Size);
+	}
 }
