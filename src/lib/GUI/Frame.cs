@@ -17,6 +17,7 @@ public class Frame : GraphicalInstance {
     }
 
     public Frame(Point position, Point size) : base(position, size) {
+        cellBackground = new Texture2D(graphicsDevice, 1, 1);
         newRectangle();
     }
 

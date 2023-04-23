@@ -59,11 +59,11 @@ public abstract class GraphicalInstance {
     protected GraphicalInstance(Point position) : this(position, new Point(50, 50), true) { }
     protected GraphicalInstance(Point position, Point size) : this(position, size, true) { }
     protected GraphicalInstance(Point position, Point size, bool visible) {
+        children = new Dictionary<int, GraphicalInstance>();
+        
         this.Position = position;
         this.Size = size;
         this.Visible = visible;
-
-        children = new Dictionary<int, GraphicalInstance>();
     }
     
     // Should never be called! Only change the object's parent!

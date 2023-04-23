@@ -14,7 +14,11 @@ public class GraphicsService : Service {
 
     public GraphicsService(Game game) : base(game) {
         graphicalInstances = new Dictionary<int, GraphicalInstance>();
+    }
+
+    public override void LoadContent() {
         spriteBatch = new SpriteBatch(game.GraphicsDevice);
+        GraphicalInstance.Load(game.GraphicsDevice, loadedServices);
     }
 
     public int AddInstance(GraphicalInstance newInstance) {
