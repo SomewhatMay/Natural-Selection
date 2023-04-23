@@ -24,7 +24,7 @@ public class SidebarService : Service {
     public override void LoadContent() {
         base.LoadContent();
 
-		TextLabel testLabel = new TextLabel(
+		FramedTextObject testLabel = new FramedTextObject(
 			new Point(10, 10),
 			new Point(1000, 1000),
 			"Hello, World!"
@@ -40,7 +40,7 @@ public class SidebarService : Service {
         graphicsService.AddInstance(children["Sidebar background"]);
 		graphicsService.AddInstance(children["Test inside background"]);
 
-		testLabel.Allignment = TextAllignment.RIGHT;
+		testLabel.Allignment = TextAllignment.CENTER;
 		Console.WriteLine(testLabel.Allignment);
 	}
 }

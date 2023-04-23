@@ -34,7 +34,7 @@ internal class TextLabel : GraphicalInstance
 
 	private Point textPosition;
 
-	private Color TextColor;
+	public Color TextColor;
 
 	private string text;
 	public string Text
@@ -48,8 +48,8 @@ internal class TextLabel : GraphicalInstance
 		}
 	}
 
-	#nullable enable
-	public TextLabel(Point position, Point size, string? text = "Label") : base(position, size)
+#nullable enable
+	public TextLabel(Point position, Point size, string? text = "Label", GraphicalInstance? parent = null) : base(position, size, parent)
 	{
 		this.Allignment = TextAllignment.LEFT;
 		this.Text = text;
