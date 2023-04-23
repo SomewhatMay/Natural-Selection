@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System;
 using Classes;
 
 namespace GUI;
@@ -36,7 +37,7 @@ public abstract class GraphicalInstance {
     protected Point drawOffset;
     private Dictionary<int, GraphicalInstance>? children;
     private int nextChildAddIndex = 0;
-    private GraphicalInstance parent;
+    private GraphicalInstance? parent;
     private int? childIndexInparent;
 
     #nullable disable
@@ -51,21 +52,31 @@ public abstract class GraphicalInstance {
             } else {
                 parent = value;
                 childIndexInparent = value.AddChild(this);
+                OffsetChanged(value.Position);
+
+                Console.WriteLine($"Changed parent of {this} to {value}");
             }
         }
     }
 
+    #nullable enable
     protected GraphicalInstance() : this(new Point(0, 0), new Point(50, 50), true) { }
     protected GraphicalInstance(Point position) : this(position, new Point(50, 50), true) { }
     protected GraphicalInstance(Point position, Point size) : this(position, size, true) { }
-    protected GraphicalInstance(Point position, Point size, bool visible) {
+    protected GraphicalInstance(Point position, Point size, GraphicalInstance? parent) : this(position, size, true, parent) { }
+    protected GraphicalInstance(Point position, Point size, bool visible, GraphicalInstance? parent = null) {
         children = new Dictionary<int, GraphicalInstance>();
         
         this.Position = position;
         this.Size = size;
         this.Visible = visible;
+
+        if (parent != null) {
+            this.Parent = parent;
+        }
     }
     
+    #nullable disable
     // Should never be called! Only change the object's parent!
     protected int AddChild(GraphicalInstance child) {
         children[nextChildAddIndex] = child;
