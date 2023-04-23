@@ -124,6 +124,7 @@ public abstract class GraphicalInstance
 				parent = value;
 				childIndexInparent = value.AddChild(this);
 				OffsetChanged(value.Position + value.drawOffset);
+			}
 		}
 	}
 

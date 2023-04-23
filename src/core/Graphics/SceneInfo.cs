@@ -38,18 +38,22 @@ public class SceneInfo {
 		background.Parent = sidebarFrame;
 		background.Name = "scene Info background";
 
-		TextLabel title = new TextLabel(
-			new Point(20, 10),
-			new Point(background.Size.X - 10, 15),
+		FramedTextObject title = new FramedTextObject(
+			new Point(2, 2),
+			new Point(background.Size.X - 4, 14),
 			"Scene Info"
 		);
 		title.Name = "Scene Info Title";
+		title.label.Position = new Point(2, 2);
+		title.BackgroundColor = new Color(.5f, .5f, .5f);
+		title.TextColor = Color.White;
 		title.Parent = background;
-		title.TextColor = Color.Black;
 
+		// Let's add all the created ui objects in our children
 		children.Add("Background", background);
 		children.Add("Title", title);
 
+		// Let's draw the children
 		foreach (var (_, child) in children)
 		{
 			graphicsService.AddInstance(child);

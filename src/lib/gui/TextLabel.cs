@@ -32,7 +32,7 @@ internal class TextLabel : GraphicalInstance
 		}
 	}
 
-	private Point textPosition;
+	private Point allignmentPosition;
 
 	public Color TextColor;
 
@@ -60,15 +60,15 @@ internal class TextLabel : GraphicalInstance
 	private void updateAllignment() {
 		if (Allignment == TextAllignment.LEFT)
 		{
-			textPosition = Position;
+			allignmentPosition = Point.Zero;
 		}
 		else if (Allignment == TextAllignment.CENTER)
 		{
-			textPosition = (new Point((Size.X - TextSize.X) / 2, 0)) + Position;
+			allignmentPosition = (new Point((Size.X - TextSize.X) / 2, 0));
 		}
 		else if (Allignment == TextAllignment.RIGHT)
 		{
-			textPosition = (new Point(Size.X - TextSize.X, 0)) + Position;
+			allignmentPosition = (new Point(Size.X - TextSize.X, 0));
 		}
 		else throw new NotImplementedException($"Not implemented allignment mode{Allignment}");
 	}
@@ -80,7 +80,7 @@ internal class TextLabel : GraphicalInstance
 
 	public override void Draw(SpriteBatch spriteBatch)
 	{
-		spriteBatch.DrawString(NaturalSelection.TextFont, Text, drawOffset.ToVector2() + textPosition.ToVector2(), TextColor);
+		spriteBatch.DrawString(NaturalSelection.TextFont, Text, Position.ToVector2() + drawOffset.ToVector2() + allignmentPosition.ToVector2(), TextColor);
 	}
 
 }
