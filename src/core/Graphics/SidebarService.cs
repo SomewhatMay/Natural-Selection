@@ -12,17 +12,20 @@ public class SidebarService : Service {
     private GraphicsService graphicsService;
 
 	private SceneInfo sceneInfo;
+	private SelectionInfo selectionInfo;
 
     public SidebarService(Game game) : base(game) {
         children = new Dictionary<string, GraphicalInstance>();
 		sceneInfo = new SceneInfo();
+		selectionInfo = new SelectionInfo();
 	}
 
     public override void Init(Dictionary<string, Service> loadedServices) {
         base.Init(loadedServices);
 
         graphicsService = (GraphicsService) loadedServices["Graphics"];
-		sceneInfo.Init(graphicsService);
+		sceneInfo.Init(graphicsService, loadedServices);
+		selectionInfo.Init(graphicsService, loadedServices, sceneInfo);
     }
 
     public override void LoadContent() {
@@ -52,5 +55,6 @@ public class SidebarService : Service {
 		graphicsService.AddInstance(title);
 
 		sceneInfo.LoadContent(sidebarBackground);
+		selectionInfo.LoadContent(sidebarBackground);
 	}
 }

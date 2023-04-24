@@ -9,24 +9,28 @@ using System;
 
 namespace Core.Graphics;
 
-public class SceneInfo {
-	public Point Position = new Point(10, 30);
+public class SelectionInfo {
+	public Point Position;
 	public Point Size = new Point(GameConstants.SidebarWidth - 20, 300);
 
 	private Dictionary<string, GraphicalInstance> children;
 	private Dictionary<string, Service> loadedServices;
 
 	private GraphicsService graphicsService;
+	SceneInfo sceneInfo;
 	private Frame sidebarFrame;
 
-	public SceneInfo() {
+	public SelectionInfo() {
 		children = new Dictionary<string, GraphicalInstance>();
     }
 
-	public void Init(GraphicsService graphicsService, Dictionary<string, Service> loadedServices);
+	public void Init(GraphicsService graphicsService, Dictionary<string, Service> loadedServices, SceneInfo sceneInfo)
 	{
 		this.graphicsService = graphicsService;
+		this.sceneInfo = sceneInfo;
 		this.loadedServices = loadedServices;
+
+		Position = new Point(sceneInfo.Position.X, sceneInfo.Position.Y + sceneInfo.Size.Y + 10);
 	}
 
 	public void LoadContent(Frame sidebarFrame)
@@ -40,15 +44,15 @@ public class SceneInfo {
 		);
 		background.Parent = sidebarFrame;
 		background.BackgroundColor = new Color(.4f, .4f, .4f);
-		background.Name = "Scene Info Background";
+		background.Name = "Selection Info Background";
 
 		FramedTextObject title = new FramedTextObject(
 			new Point(5, 5),
 			new Point(background.Size.X - 10, 20),
-			"Scene Info"
+			"Selection Info"
 		);
 		title.Allignment = TextAllignment.CENTER;
-		title.Name = "Scene Info Title";
+		title.Name = "Selection Info Title";
 		title.label.Position = new Point(5, 5);
 		title.BackgroundColor = new Color(.6f, .6f, .6f);
 		title.TextColor = Color.White;
@@ -61,8 +65,6 @@ public class SceneInfo {
 		);
 		entriesParent.BackgroundColor = new Color(.6f, .6f, .6f);
 
-		LoadEntries();
-
 		// Let's add all the created ui objects in our children
 		children.Add("Background", background);
 		children.Add("Title", title);
@@ -73,11 +75,5 @@ public class SceneInfo {
 		{
 			graphicsService.AddInstance(child);
 		}
-	}
-
-	// Just a helper function that loads all the entries :)
-	private void LoadEntries()
-	{
-
 	}
 }

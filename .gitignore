@@ -68,3 +68,4 @@ monodroid*.msi
 artifacts/
 *.v2
 *.vsidx
+*.sln
