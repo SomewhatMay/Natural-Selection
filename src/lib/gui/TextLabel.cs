@@ -17,7 +17,7 @@ public enum TextAllignment {
 	CENTER
 }
 
-internal class TextLabel : GraphicalInstance
+public class TextLabel : GraphicalInstance
 {
 
 	public Point TextSize { get; private set; }
@@ -27,6 +27,9 @@ internal class TextLabel : GraphicalInstance
 	{
 		get { return allignment; } set
 		{
+			if (allignment == value)
+				return;
+
 			allignment = value;
 			updateAllignment();
 		}
@@ -42,6 +45,9 @@ internal class TextLabel : GraphicalInstance
 		get { return text; }
 		set 
 		{
+			if (text == value)
+				return;
+
 			text = value;
 			TextSize = NaturalSelection.TextFont.MeasureString(value).ToPoint();
 			updateAllignment();

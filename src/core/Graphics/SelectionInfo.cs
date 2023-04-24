@@ -14,7 +14,6 @@ public class SelectionInfo {
 	public Point Size = new Point(GameConstants.SidebarWidth - 20, 300);
 
 	private Dictionary<string, GraphicalInstance> children;
-	private Dictionary<string, Service> loadedServices;
 
 	private GraphicsService graphicsService;
 	SceneInfo sceneInfo;
@@ -28,7 +27,6 @@ public class SelectionInfo {
 	{
 		this.graphicsService = graphicsService;
 		this.sceneInfo = sceneInfo;
-		this.loadedServices = loadedServices;
 
 		Position = new Point(sceneInfo.Position.X, sceneInfo.Position.Y + sceneInfo.Size.Y + 10);
 	}

@@ -7,7 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace GUI;
-internal class FramedTextObject : Frame
+
+public class FramedTextObject : Frame
 {
 	public TextLabel label;
 

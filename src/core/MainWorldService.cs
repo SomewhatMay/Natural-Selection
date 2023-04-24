@@ -80,6 +80,14 @@ public class MainWorld : Service {
         NextGeneration();
     }
 
+	public void TogglePause() {
+		if (GameState == GameState.RUNNING) {
+			GameState = GameState.PAUSED;
+		} else {
+			GameState = GameState.RUNNING;
+		}
+	}
+
     private bool isFoodFinished() {
         if (Statistics.FoodAlive > 0) {
             return false;
@@ -300,9 +308,16 @@ public class MainWorld : Service {
             NextGeneration(gameGrid, garrisonedCells);
         } else if (Keyboard.HasClicked(Microsoft.Xna.Framework.Input.Keys.N)) {
             NextGeneration();
-        }
+        } else if (Keyboard.HasClicked(Microsoft.Xna.Framework.Input.Keys.P)) {
+			TogglePause();
+		} else if (Keyboard.HasClicked(Microsoft.Xna.Framework.Input.Keys.D)) {
+			if (GameState != GameState.RUNNING)
+				return;
 
-        if (lastUpdate.Calculate() >= GameConstants.UpdateRate) {
+			NextDay();
+		}
+
+		if (lastUpdate.Calculate() >= GameConstants.UpdateRate) {
 
             NextDay();
 

@@ -57,4 +57,10 @@ public class SidebarService : Service {
 		sceneInfo.LoadContent(sidebarBackground);
 		selectionInfo.LoadContent(sidebarBackground);
 	}
+
+	public override void Update(GameTime gameTime) {
+		base.Update(gameTime);
+
+		sceneInfo.Update(gameTime);
+	}
 }
