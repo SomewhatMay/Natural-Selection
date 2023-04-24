@@ -5,6 +5,8 @@
 
 #Visual Studio files
 *.pidb
+.vs/
+.vs/*
 *.userprefs
 *.[Oo]bj
 *.exe
@@ -64,3 +66,5 @@ monodroid*.msi
 *.VC.opendb
 
 artifacts/
+*.v2
+*.vsidx
