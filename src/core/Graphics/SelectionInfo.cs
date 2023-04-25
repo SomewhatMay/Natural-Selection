@@ -51,7 +51,7 @@ public class SelectionInfo {
 		);
 		title.Allignment = TextAllignment.CENTER;
 		title.Name = "Selection Info Title";
-		title.label.Position = new Point(5, 5);
+		title.TextLabel.Position = new Point(5, 5);
 		title.BackgroundColor = new Color(.6f, .6f, .6f);
 		title.TextColor = Color.White;
 		title.Parent = background;

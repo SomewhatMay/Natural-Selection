@@ -83,12 +83,12 @@ public class TextLabel : GraphicalInstance
 		UpdateTextPosition();
 	}
 
-	public virtual void UpdateTextPosition() 
+	protected virtual void UpdateTextPosition() 
 	{
 		this.AbsoluteTextPosition = this.AbsolutePosition + this.allignmentPosition;
 	}
 
-	public override void OnPositionUpdated() 
+	protected override void OnPositionUpdated() 
 	{
 		base.OnPositionUpdated();
 		UpdateTextPosition();

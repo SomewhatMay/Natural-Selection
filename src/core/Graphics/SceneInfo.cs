@@ -10,6 +10,7 @@ using Core;
 using System.Reflection.Metadata;
 using System.Security.Principal;
 using System.Net.Http.Headers;
+using System.Reflection;
 
 namespace Core.Graphics;
 
@@ -52,7 +53,7 @@ public class SceneInfo {
 		);
 		title.Allignment = TextAllignment.CENTER;
 		title.Name = "Scene Info Title";
-		title.label.Position = new Point(5, 5);
+		title.TextLabel.Position = new Point(5, 5);
 		title.BackgroundColor = new Color(.6f, .6f, .6f);
 		title.TextColor = Color.White;
 		title.Parent = background;
@@ -84,7 +85,7 @@ public class SceneInfo {
 	FrameEntry Day;
 	FrameEntry CellInfo;
 	FrameEntry FoodInfo;
-	FrameEntry PauseButton;
+	FramedTextObject PauseButton;
 
 	int entryHeight = 20;
 	Color EntryBackgroundColor = new Color(.4f, .4f, .4f);
@@ -92,8 +93,14 @@ public class SceneInfo {
 	Point entrySize;
 	int entryPad = 5;
 
-	private FrameEntry createSceneEntry(string title, int index) {
-		Point position = new Point(entryPad, ((index + 1) * entryPad) + (index * entryHeight));
+	private int getPositionByIndex(int index) 
+	{
+		return ((index + 1) * entryPad) + (index * entryHeight);
+	}
+
+	private FrameEntry createSceneEntry(string title, int index) 
+	{
+		Point position = new Point(entryPad, getPositionByIndex(index));
 		FrameEntry entry = new FrameEntry(position, entrySize);
 		entry.Parent = entriesParent;
 		entry.TitleText = title;
@@ -114,23 +121,28 @@ public class SceneInfo {
 		Day = createSceneEntry("Day", 2);
 		CellInfo = createSceneEntry("Cell Info", 3);
 		FoodInfo = createSceneEntry("Food Info", 4);
-		PauseButton = createSceneEntry("Pause Game", 5);
+
+		Point position = new Point(entryPad, getPositionByIndex(5));
+		PauseButton = new FramedTextObject(position, entrySize);
+		PauseButton.Parent = entriesParent;
+		PauseButton.Text = "Pause Game";
+		PauseButton.TextColor = Color.White;
+		PauseButton.TextLabel.Allignment = TextAllignment.CENTER;
+		PauseButton.BackgroundColor = EntryBackgroundColor;
+
+		children.Add("Pause Button", PauseButton);
 
 		PauseButton.MakeClickableInstance();
-		PauseButton.ValueText = "";
-		PauseButton.TitleLabel.Allignment = TextAllignment.CENTER;
 		PauseButton.SetOnClicked((bool alreadyClicked, int mouseX, int mouseY) => {
-			Console.WriteLine("Clicked!");
-
 			if (alreadyClicked)
 				return;
 
 			mainWorld.TogglePause();
 
 			if (mainWorld.GameState == Other.GameState.RUNNING) {
-				PauseButton.ValueText = "Pause Game";
+				PauseButton.Text = "Pause Game";
 			} else {
-				PauseButton.ValueText = "Play Game";
+				PauseButton.Text = "Play Game";
 			}
 		});
 	}

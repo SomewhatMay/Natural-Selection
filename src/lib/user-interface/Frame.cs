@@ -37,7 +37,7 @@ public class Frame : GraphicalInstance
 
 	protected override void OnPositionUpdated()
 	{
-		base.OnPositionUpdated(newOffset);
+		base.OnPositionUpdated();
 		newRectangle();
 	}
 
