@@ -93,7 +93,7 @@ public class SceneInfo {
 	int entryPad = 5;
 
 	private FrameEntry createSceneEntry(string title, int index) {
-		Point position = new Point(entryPad, entryPad + (index * entryHeight));
+		Point position = new Point(entryPad, ((index + 1) * entryPad) + (index * entryHeight));
 		FrameEntry entry = new FrameEntry(position, entrySize);
 		entry.Parent = entriesParent;
 		entry.TitleText = title;
@@ -107,7 +107,7 @@ public class SceneInfo {
 	}
 
 	private void LoadEntries() {
-		Point entrySize = new Point(entriesParent.Size.X - 10, entryHeight);
+		entrySize = new Point(entriesParent.Size.X - 10, entryHeight);
 
 		GameState = createSceneEntry("Game State", 0);
 		Generation = createSceneEntry("Generation", 1);
@@ -116,63 +116,12 @@ public class SceneInfo {
 		FoodInfo = createSceneEntry("Food Info", 4);
 		PauseButton = createSceneEntry("Pause Game", 5);
 
-		//GameState = new FrameEntry(
-		//	new Point(entryPad, entryPad),
-		//	entrySize
-		//);
-		//GameState.Parent = entriesParent;
-		//GameState.BackgroundColor = EntryBackgroundColor;
-		//GameState.ValueColor = ValueColor;
-		//GameState.TitleColor = Color.White;
-
-		//Generation = new FrameEntry(
-		//	new Point(entryPad, (entryPad + entryHeight) * 1),
-		//	entrySize
-		//);
-		//Generation.Parent = entriesParent;
-		//Generation.BackgroundColor = EntryBackgroundColor;
-		//Generation.ValueColor = ValueColor;
-		//Generation.TitleColor = Color.White;
-
-		//Day = new FrameEntry(
-		//	new Point(entryPad, (entryPad + entryHeight) * 2),
-		//	entrySize
-		//);
-		//Day.Parent = entriesParent;
-		//Day.BackgroundColor = EntryBackgroundColor;
-		//Day.ValueColor = ValueColor;
-		//Day.TitleColor = Color.White;
-
-		//CellInfo = new FrameEntry(
-		//	new Point(entryPad, (entryPad + entryHeight) * 3),
-		//	entrySize
-		//);
-		//CellInfo.Parent = entriesParent;
-		//CellInfo.BackgroundColor = EntryBackgroundColor;
-		//CellInfo.ValueColor = ValueColor;
-		//CellInfo.TitleColor = Color.White;
-
-		//FoodInfo = new FrameEntry(
-		//	new Point(entryPad, (entryPad + entryHeight) * 4),
-		//	entrySize
-		//);
-		//FoodInfo.Parent = entriesParent;
-		//FoodInfo.BackgroundColor = EntryBackgroundColor;
-		//FoodInfo.ValueColor = ValueColor;
-		//FoodInfo.TitleColor = Color.White;
-
-		//PauseButton = new FrameEntry(
-		//	new Point(entryPad, (entryPad + entryHeight) * 5),
-		//	entrySize,
-		//	"Pause Game"
-		//);
-		//PauseButton.Parent = entriesParent;
-		//PauseButton.BackgroundColor = EntryBackgroundColor;
-		//PauseButton.ValueColor = ValueColor;
-		//PauseButton.TitleColor = Color.White;
-
 		PauseButton.MakeClickableInstance();
+		PauseButton.ValueText = "";
+		PauseButton.TitleLabel.Allignment = TextAllignment.CENTER;
 		PauseButton.SetOnClicked((bool alreadyClicked, int mouseX, int mouseY) => {
+			Console.WriteLine("Clicked!");
+
 			if (alreadyClicked)
 				return;
 
@@ -184,13 +133,6 @@ public class SceneInfo {
 				PauseButton.ValueText = "Play Game";
 			}
 		});
-
-		//children.Add("GameState", GameState);
-		//children.Add("Generation", Generation);
-		//children.Add("Day", Day);
-		//children.Add("CellInfo", CellInfo);
-		//children.Add("FoodInfo", FoodInfo);
-		//children.Add("PauseButton", PauseButton);
 	}
 
 	public void Update(GameTime gameTime) {

@@ -9,8 +9,7 @@ namespace GUI;
 
 public delegate void onClickedDelegate(bool alreadyClicked, int mouseX, int mouseY);
 
-public abstract class GraphicalInstance
-{
+public abstract class GraphicalInstance {
 	protected static GraphicsDevice graphicsDevice;
 	protected static Dictionary<string, Service> loadedServices;
 	private static Dictionary<int, GraphicalInstance> clickableInstances;
@@ -19,36 +18,30 @@ public abstract class GraphicalInstance
 	private static MouseState previousMouseState;
 
 	// loads the GraphicalInstance class statically before calling any object-based methods
-	public static void Load(GraphicsDevice _graphicsDevice, Dictionary<string, Service> _loadedServices)
-	{
+	public static void Load(GraphicsDevice _graphicsDevice, Dictionary<string, Service> _loadedServices) {
 		graphicsDevice = _graphicsDevice;
 		loadedServices = _loadedServices;
 
 		clickableInstances = new Dictionary<int, GraphicalInstance>();
 	}
 
-	public static void FrameCheck(GameTime gameTime)
-	{
+	public static void FrameCheck(GameTime gameTime) {
 		// Let's check if we are clicking on any clickable instances;
 		MouseState mouseState = Mouse.GetState();
 
 		// Let's only do the checking if the mosue is clicked
-		if (mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed)
-		{
+		if (mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton != ButtonState.Pressed) {
 
 			int mouseX = mouseState.X, mouseY = mouseState.Y;
 			// Determines whether the input was passed on to another UI instance already
 			// Useful if you dont want to click on multiple things if they are overlapped
 			bool alraedyClicked = false;
 
-			foreach (var (_, clickableInstance) in clickableInstances)
-			{
+			foreach (var (_, clickableInstance) in clickableInstances) {
 				// Standard method of checking if our mouse coordinates are in the draw object's position and size
 				// Does not work with circles, Skull emoji
-				if ((mouseX >= clickableInstance.Position.X) && (mouseY > clickableInstance.Position.Y))
-				{
-					if ((mouseX <= (clickableInstance.Position.X + clickableInstance.Size.X)) && (mouseY <= (clickableInstance.Position.Y + clickableInstance.Size.Y)))
-					{
+				if ((mouseX >= clickableInstance.Position.X) && (mouseY > clickableInstance.Position.Y)) {
+					if ((mouseX <= (clickableInstance.Position.X + clickableInstance.Size.X)) && (mouseY <= (clickableInstance.Position.Y + clickableInstance.Size.Y))) {
 						if (!(clickableInstance.Active && clickableInstance.Visible))
 							continue;
 
@@ -73,13 +66,14 @@ public abstract class GraphicalInstance
 	// Is the instance visible? If it's not visible, it's not clickable
 	public bool Visible;
 
-	protected Point drawPosition;
+	public Point AbsolutePosition { get; private set; }
+	protected Point position;
 	public Point Position
 	{
-		get { return drawPosition; }
+		get { return position; }
 		set
 		{
-			drawPosition = value;
+			position = value;
 			OnPositionUpdated();
 			UpdateAllChildrenOffsets();
 		}
@@ -151,8 +145,7 @@ public abstract class GraphicalInstance
 
 	// Clickable stuff
 	private int objectClickableIndex;
-	public void MakeClickableInstance()
-	{
+	public void MakeClickableInstance() {
 		if (ClickableInstance) return; // it's already a clickable instance
 
 		ClickableInstance = true;
