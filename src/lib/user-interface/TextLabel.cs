@@ -25,7 +25,8 @@ public class TextLabel : GraphicalInstance
 	private TextAllignment allignment;
 	public TextAllignment Allignment
 	{
-		get { return allignment; } set
+		get { return allignment; } 
+		set
 		{
 			if (allignment == value)
 				return;
@@ -36,6 +37,7 @@ public class TextLabel : GraphicalInstance
 	}
 
 	private Point allignmentPosition;
+	public Point AbsoluteTextPosition;
 
 	public Color TextColor;
 
@@ -77,16 +79,24 @@ public class TextLabel : GraphicalInstance
 			allignmentPosition = (new Point(Size.X - TextSize.X, 0));
 		}
 		else throw new NotImplementedException($"Not implemented allignment mode{Allignment}");
+
+		UpdateTextPosition();
 	}
 
-	protected override void OffsetChanged(Point newOffset)
+	public virtual void UpdateTextPosition() 
 	{
-		drawOffset = newOffset;
+		this.AbsoluteTextPosition = this.AbsolutePosition + this.allignmentPosition;
+	}
+
+	public override void OnPositionUpdated() 
+	{
+		base.OnPositionUpdated();
+		UpdateTextPosition();
 	}
 
 	public override void Draw(SpriteBatch spriteBatch)
 	{
-		spriteBatch.DrawString(NaturalSelection.TextFont, Text, Position.ToVector2() + drawOffset.ToVector2() + allignmentPosition.ToVector2(), TextColor);
+		spriteBatch.DrawString(NaturalSelection.TextFont, Text, AbsoluteTextPosition.ToVector2(), TextColor);
 	}
 
 }

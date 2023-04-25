@@ -35,14 +35,20 @@ public class Frame : GraphicalInstance
 		spriteBatch.Draw(this.cellBackground, this.rectangle, this.BackgroundColor);
 	}
 
-	protected override void OffsetChanged(Point newOffset)
+	protected override void OnPositionUpdated()
 	{
-		base.OffsetChanged(newOffset);
+		base.OnPositionUpdated(newOffset);
+		newRectangle();
+	}
+
+	protected override void OnSizeUpdated()
+	{
+		base.OnSizeUpdated();
 		newRectangle();
 	}
 
 	private void newRectangle()
 	{
-		rectangle = new Rectangle(this.drawPosition + this.drawOffset, this.Size);
+		rectangle = new Rectangle(this.AbsolutePosition, this.Size);
 	}
 }

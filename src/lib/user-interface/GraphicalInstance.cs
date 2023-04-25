@@ -67,15 +67,21 @@ public abstract class GraphicalInstance {
 	public bool Visible;
 
 	public Point AbsolutePosition { get; private set; }
-	protected Point position;
+	private Point parentOffset;
+	protected Point ParentOffset { get { return parentOffset; } 
+		set {
+			parentOffset = value;
+			UpdateAbsolutePosition();
+		}
+	}
+	private Point position;
 	public Point Position
 	{
 		get { return position; }
 		set
 		{
 			position = value;
-			OnPositionUpdated();
-			UpdateAllChildrenOffsets();
+			UpdateAbsolutePosition();
 		}
 	}
 
@@ -92,7 +98,6 @@ public abstract class GraphicalInstance {
 
 #nullable enable
 	public string Name;
-	protected Point drawOffset;
 	private Dictionary<int, GraphicalInstance>? children;
 	private int nextChildAddIndex = 0;
 	private GraphicalInstance? parent;
@@ -181,17 +186,16 @@ public abstract class GraphicalInstance {
 
 	private void UpdateAllChildrenOffsets()
 	{
-		Point totalOffset = this.Position + this.drawOffset;
-
 		foreach (var (index, child) in children)
 		{
-			child.OffsetChanged(totalOffset);
+			child.ParentOffset = this.AbsolutePosition;
 		}
 	}
 
-	protected virtual void OffsetChanged(Point newOffset)
+	private virtual void UpdateAbsolutePosition()
 	{
-		this.drawOffset = newOffset;
+		this.AbsolutePosition = this.Position + this.ParentOffset;
+		OnPositionUpdated();
 		UpdateAllChildrenOffsets();
 	}
 
