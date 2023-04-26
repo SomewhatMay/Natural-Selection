@@ -189,7 +189,7 @@ public class SceneInfo {
 	private void OnGameStateChanged(EventArgs _) => GameState.ValueText = mainWorld.GameState.ToString();
 	private void OnGenerationChanged(EventArgs _) => Generation.ValueText = MainWorld.Statistics.Generation.ToString();
 	private void OnDayChanged(EventArgs _) => Day.ValueText = MainWorld.Statistics.Day.ToString();
-	private void OnCellInfoChanged(EventArgs _) => CellInfo.ValueText = MainWorld.Statistics.FoodAlive.ToString() + $" ({MainWorld.Statistics.CellsGarrisoned})";
-	private void OnFoodInfoChanged(EventArgs _) => FoodInfo.ValueText = MainWorld.Statistics.Generation.ToString() + $" ({MainWorld.Statistics.FoodEaten})";
+	private void OnCellInfoChanged(EventArgs _) => CellInfo.ValueText = MainWorld.Statistics.CellsAlive.ToString() + $" ({MainWorld.Statistics.CellsGarrisoned})";
+	private void OnFoodInfoChanged(EventArgs _) => FoodInfo.ValueText = MainWorld.Statistics.FoodAlive.ToString() + $" ({MainWorld.Statistics.FoodEaten})";
 }
 
