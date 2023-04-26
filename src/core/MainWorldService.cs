@@ -1,5 +1,3 @@
-#nullable enable
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -16,23 +14,32 @@ using Other;
 
 namespace Core;
 
-public class MainWorld : Service {
-    public static class Statistics {
-        public static int Day { get; set; }
-        public static int Generation { get; set; }
-        public static int FoodAlive { get; set; }
-        public static int FoodEaten { get; set; }
-        public static int CellsAlive { get; set; }
-        public static int CellsGarrisoned { get; set; }
-    }
+public class ValueChangedEventArgs<T> : EventArgs
+{
+	public T OldValue;
+	public T NewValue;
+}
 
-    private GameState gameState;
-    public GameState GameState { get { return gameState; } set {
-        gameState = value;
-    }}
+public delegate void ChangedHandlerDelegate(EventArgs args);
 
-    // Class used fields
-    Grid gameGrid;
+public partial class MainWorld : Service {
+
+	private GameState gameState;
+	public GameState GameState
+	{
+		get { return gameState; }
+		set
+		{
+			GameState oldValue = gameState;
+			gameState = value;
+			OnGameStateChanged?.Invoke(new ValueChangedEventArgs<GameState> { OldValue = oldValue, NewValue = value });
+		}
+	}
+	public event ChangedHandlerDelegate OnGameStateChanged;
+
+#nullable enable
+	// Class used fields
+	Grid gameGrid;
     List<Cell> garrisonedCells;
     SpriteBatch spriteBatch;
 
@@ -56,6 +63,7 @@ public class MainWorld : Service {
     public MainWorld(Game game, Random gameRandom) : base(game) {
         this.game = game;
         this.gameRandom = gameRandom;
+		Statistics.UpdateRate = GameConstants.UpdateRate;
 
         lastUpdate = new DifferenceTime();
         generationElapsedTime = new DifferenceTime();
@@ -79,6 +87,14 @@ public class MainWorld : Service {
 
         NextGeneration();
     }
+
+	public void TogglePause() {
+		if (GameState == GameState.RUNNING) {
+			GameState = GameState.PAUSED;
+		} else {
+			GameState = GameState.RUNNING;
+		}
+	}
 
     private bool isFoodFinished() {
         if (Statistics.FoodAlive > 0) {
@@ -127,7 +143,6 @@ public class MainWorld : Service {
     }
 
     public void NextGeneration(Grid? currentGrid = null, List<Cell>? garrisonedGrid = null) {
-        ++Statistics.Generation; // Let's increment the generation
         Statistics.Day = 0;
         Statistics.CellsAlive = 0;
         Statistics.CellsGarrisoned = 0;
@@ -139,11 +154,17 @@ public class MainWorld : Service {
         List<LifeCell> leaderboard = new List<LifeCell>();
 
         if ((currentGrid != null) && (garrisonedGrid != null)) {
-            updateLeaderboard(leaderboard, currentGrid.cellList);
+			++Statistics.Generation; // Let's increment the generation if we are advancing one
+
+			updateLeaderboard(leaderboard, currentGrid.cellList);
             updateLeaderboard(leaderboard, garrisonedGrid);
 
             Console.WriteLine($"New generation started! Last generation took {generationElapsedTime.Calculate(true)} seconds!");
-        }
+        } 
+		else
+		{
+			Statistics.Generation = 1; // let's set the generation to 1 if we are restarting
+		}
 
         // Empty the grid
         gameGrid.Clear();
@@ -300,9 +321,17 @@ public class MainWorld : Service {
             NextGeneration(gameGrid, garrisonedCells);
         } else if (Keyboard.HasClicked(Microsoft.Xna.Framework.Input.Keys.N)) {
             NextGeneration();
-        }
+        } else if (Keyboard.HasClicked(Microsoft.Xna.Framework.Input.Keys.Space)) {
+			TogglePause();
+		} else if (Keyboard.HasClicked(Microsoft.Xna.Framework.Input.Keys.D)) {
+			if (GameState != GameState.PAUSED)
+				return;
 
-        if (lastUpdate.Calculate() >= GameConstants.UpdateRate) {
+			NextDay();
+		}
+
+		if (lastUpdate.Calculate() >= Statistics.UpdateRate && (GameState == GameState.RUNNING))
+		{
 
             NextDay();
 

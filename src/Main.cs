@@ -14,88 +14,101 @@ namespace NaturalSelectionRemastered;
 
 public class NaturalSelection : Game
 {
-    public GraphicsDeviceManager _graphics;
-    public SpriteBatch _spriteBatch;
+	public GraphicsDeviceManager _graphics;
+	public SpriteBatch _spriteBatch;
 
-    public Random gameRandom;
+	public static SpriteFont TextFont { get; private set; }
 
-    public Dictionary<string, Service> loadedServices;
+	public Random gameRandom;
 
-    public Service LoadService(string serviceName, Service service) {
-        loadedServices.Add(serviceName, service);
+	public Dictionary<string, Service> loadedServices;
 
-        return service;
-    }
+	public Service LoadService(string serviceName, Service service)
+	{
+		loadedServices.Add(serviceName, service);
 
-    public NaturalSelection() {
-        // initialize the constants 
-        GameConstants.Initialize();
+		return service;
+	}
 
-        _graphics = new GraphicsDeviceManager(this);
-        _graphics.PreferredBackBufferWidth = GameConstants.WindowSize.X;
-        _graphics.PreferredBackBufferHeight = GameConstants.WindowSize.Y;
-        _graphics.SynchronizeWithVerticalRetrace = false;
-        Content.RootDirectory = "Content";
-        IsMouseVisible = true;
+	public NaturalSelection()
+	{
+		// initialize the constants 
+		GameConstants.Initialize();
 
-        this.IsFixedTimeStep = false;
+		_graphics = new GraphicsDeviceManager(this);
+		_graphics.PreferredBackBufferWidth = GameConstants.WindowSize.X;
+		_graphics.PreferredBackBufferHeight = GameConstants.WindowSize.Y;
+		_graphics.SynchronizeWithVerticalRetrace = false;
+		Content.RootDirectory = "Content";
+		IsMouseVisible = true;
 
-        gameRandom = new Random((int) GameConstants.Seed);
+		this.IsFixedTimeStep = false;
 
-        // let's load all the services
-        loadedServices = new Dictionary<string, Service>();
-        LoadService("MainWorld", new MainWorld(this, gameRandom));
-        LoadService("Schedule", new ScheduleService(this, gameRandom));
-        LoadService("Graphics", new GraphicsService(this));
-        LoadService("Sidebar", new SidebarService(this));
+		gameRandom = new Random((int)GameConstants.Seed);
 
-        Console.WriteLine($"Starting game with Seed {GameConstants.Seed}");
-    }
+		// let's load all the services
+		loadedServices = new Dictionary<string, Service>();
+		LoadService("MainWorld", new MainWorld(this, gameRandom));
+		LoadService("Schedule", new ScheduleService(this, gameRandom));
+		LoadService("Graphics", new GraphicsService(this));
+		LoadService("Sidebar", new SidebarService(this));
 
-    protected override void Initialize() {
-        _graphics.ApplyChanges();
-        // TODO: Add your initialization logic here
+		Console.WriteLine($"Starting Natural Selection [REMASTERED v{GameConstants.version}] with Seed {GameConstants.Seed}");
+	}
 
-        // let's call initialize after all services are loaded
-        foreach (KeyValuePair<string, Service> pair in loadedServices) {
-            pair.Value.Init(loadedServices);
-        }
+	protected override void Initialize()
+	{
+		_graphics.ApplyChanges();
+		// TODO: Add your initialization logic here
 
-        base.Initialize();
-    }
+		// let's call initialize after all services are loaded
+		foreach (KeyValuePair<string, Service> pair in loadedServices)
+		{
+			pair.Value.Init(loadedServices);
+		}
 
-    protected override void LoadContent() {
-        _spriteBatch = new SpriteBatch(GraphicsDevice);
+		base.Initialize();
+	}
 
-        // TODO: use this.Content to load your game content here
-        foreach (KeyValuePair<string, Service> pair in loadedServices) {
-            pair.Value.LoadContent();
-        }
-    }
+	protected override void LoadContent()
+	{
+		_spriteBatch = new SpriteBatch(GraphicsDevice);
+		TextFont = Content.Load<SpriteFont>("Fonts/Consolas");
 
-    protected override void Update(GameTime gameTime) {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Microsoft.Xna.Framework.Input.Keyboard.GetState().IsKeyDown(Keys.Escape))
-            Exit();
+		// TODO: use this.Content to load your game content here
+		foreach (KeyValuePair<string, Service> pair in loadedServices)
+		{
+			pair.Value.LoadContent();
+		}
+	}
 
-        // TODO: Add your update logic here
+	protected override void Update(GameTime gameTime)
+	{
+		if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Microsoft.Xna.Framework.Input.Keyboard.GetState().IsKeyDown(Keys.Escape))
+			Exit();
 
-        foreach (KeyValuePair<string, Service> pair in loadedServices) {
-            pair.Value.Update(gameTime);
-        }
+		// TODO: Add your update logic here
 
-        base.Update(gameTime);
-    }
+		foreach (KeyValuePair<string, Service> pair in loadedServices)
+		{
+			pair.Value.Update(gameTime);
+		}
 
-    protected override void Draw(GameTime gameTime) {
-        GraphicsDevice.Clear(Color.Black);
+		base.Update(gameTime);
+	}
 
-        // TODO: Add your drawing code here
+	protected override void Draw(GameTime gameTime)
+	{
+		GraphicsDevice.Clear(Color.Black);
 
-        foreach (KeyValuePair<string, Service> pair in loadedServices) {
-            pair.Value.Draw(gameTime);
-        }
+		// TODO: Add your drawing code here
+
+		foreach (KeyValuePair<string, Service> pair in loadedServices)
+		{
+			pair.Value.Draw(gameTime);
+		}
 
 
-        base.Draw(gameTime);
-    }
+		base.Draw(gameTime);
+	}
 }
