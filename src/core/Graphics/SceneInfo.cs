@@ -11,6 +11,7 @@ using System.Reflection.Metadata;
 using System.Security.Principal;
 using System.Net.Http.Headers;
 using System.Reflection;
+using static Core.MainWorld;
 
 namespace Core.Graphics;
 
@@ -80,6 +81,7 @@ public class SceneInfo {
 
 	// Just a helper function that loads all the entries :)
 
+	FrameEntry UpdateRate;
 	FrameEntry GameState;
 	FrameEntry Generation;
 	FrameEntry Day;
@@ -91,6 +93,8 @@ public class SceneInfo {
 	Color EntryBackgroundColor = new Color(.4f, .4f, .4f);
 	Color ValueColor = new Color(.79f, .29f, .18f);
 	Point entrySize;
+	Point TitleLabelPadding = new Point(5, 5);
+	Point ValueLabelPadding = new Point(-5, 5);
 	int entryPad = 5;
 
 	private int getPositionByIndex(int index) 
@@ -108,6 +112,9 @@ public class SceneInfo {
 		entry.ValueColor = ValueColor;
 		entry.TitleColor = Color.White;
 
+		entry.TitleLabel.Position = TitleLabelPadding;
+		entry.ValueLabel.Position = ValueLabelPadding;
+
 		children.Add(title, entry);
 
 		return entry;
@@ -116,42 +123,73 @@ public class SceneInfo {
 	private void LoadEntries() {
 		entrySize = new Point(entriesParent.Size.X - 10, entryHeight);
 
-		GameState = createSceneEntry("Game State", 0);
-		Generation = createSceneEntry("Generation", 1);
-		Day = createSceneEntry("Day", 2);
-		CellInfo = createSceneEntry("Cell Info", 3);
-		FoodInfo = createSceneEntry("Food Info", 4);
+		// Let's create all of the entries
+		UpdateRate = createSceneEntry("Update Rate", 0);
+		GameState = createSceneEntry("Game State", 1);
+		Generation = createSceneEntry("Generation", 2);
+		Day = createSceneEntry("Day", 3);
+		CellInfo = createSceneEntry("Cell Info", 4);
+		FoodInfo = createSceneEntry("Food Info", 5);
 
-		Point position = new Point(entryPad, getPositionByIndex(5));
+		// Let's create a text button for the pause game
+		Point position = new Point(entryPad, getPositionByIndex(6));
 		PauseButton = new FramedTextObject(position, entrySize);
 		PauseButton.Parent = entriesParent;
 		PauseButton.Text = "Pause Game";
 		PauseButton.TextColor = Color.White;
 		PauseButton.TextLabel.Allignment = TextAllignment.CENTER;
 		PauseButton.BackgroundColor = EntryBackgroundColor;
+		PauseButton.TextLabel.Position = new Point(0, 5);
 
 		children.Add("Pause Button", PauseButton);
 
+		// Let's connect a method that gets called upon it being clicked
 		PauseButton.MakeClickableInstance();
-		PauseButton.SetOnClicked((bool alreadyClicked, int mouseX, int mouseY) => {
+		PauseButton.SetOnClicked((bool alreadyClicked, int mouseX, int mouseY) =>
+		{
 			if (alreadyClicked)
 				return;
 
 			mainWorld.TogglePause();
 
-			if (mainWorld.GameState == Other.GameState.RUNNING) {
+			if (mainWorld.GameState == Other.GameState.RUNNING)
+			{
 				PauseButton.Text = "Pause Game";
-			} else {
+			}
+			else
+			{
 				PauseButton.Text = "Play Game";
 			}
 		});
+
+		// Connect listeners to all the entries
+		MainWorld.Statistics.OnUpdateRateChanged += OnUpdateRateChanged;
+		OnUpdateRateChanged(EventArgs.Empty);
+
+		mainWorld.OnGameStateChanged += OnGameStateChanged;
+		OnGameStateChanged(EventArgs.Empty);
+
+		MainWorld.Statistics.OnGenerationChanged += OnGenerationChanged;
+		OnGenerationChanged(EventArgs.Empty);
+
+		MainWorld.Statistics.OnDayChanged += OnDayChanged;
+		OnDayChanged(EventArgs.Empty);
+
+		MainWorld.Statistics.OnFoodAliveChanged += OnFoodInfoChanged;
+		MainWorld.Statistics.OnFoodEatenChanged += OnFoodInfoChanged;
+		OnFoodInfoChanged(EventArgs.Empty);
+
+		MainWorld.Statistics.OnCellsAliveChanged += OnCellInfoChanged;
+		MainWorld.Statistics.OnCellsGarrisonedChanged += OnCellInfoChanged;
+		OnCellInfoChanged(EventArgs.Empty);
 	}
 
-	public void Update(GameTime gameTime) {
-		GameState.ValueText = mainWorld.GameState.ToString();
-		Generation.ValueText = MainWorld.Statistics.Generation.ToString();
-		Day.ValueText = MainWorld.Statistics.Day.ToString();
-		CellInfo.ValueText = MainWorld.Statistics.FoodAlive.ToString() + $" ({MainWorld.Statistics.CellsGarrisoned})";
-		FoodInfo.ValueText = MainWorld.Statistics.Generation.ToString() + $" ({MainWorld.Statistics.FoodEaten})";
-	}
+	// Create listeners for each of the entries
+	private void OnUpdateRateChanged(EventArgs _) => UpdateRate.ValueText = MainWorld.Statistics.UpdateRate.ToString();
+	private void OnGameStateChanged(EventArgs _) => GameState.ValueText = mainWorld.GameState.ToString();
+	private void OnGenerationChanged(EventArgs _) => Generation.ValueText = MainWorld.Statistics.Generation.ToString();
+	private void OnDayChanged(EventArgs _) => Day.ValueText = MainWorld.Statistics.Day.ToString();
+	private void OnCellInfoChanged(EventArgs _) => CellInfo.ValueText = MainWorld.Statistics.FoodAlive.ToString() + $" ({MainWorld.Statistics.CellsGarrisoned})";
+	private void OnFoodInfoChanged(EventArgs _) => FoodInfo.ValueText = MainWorld.Statistics.Generation.ToString() + $" ({MainWorld.Statistics.FoodEaten})";
 }
+
