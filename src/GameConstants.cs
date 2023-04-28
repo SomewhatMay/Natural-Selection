@@ -7,7 +7,7 @@ namespace Constants;
 public static class GameConstants {
 	public static string version = "1.9.2";
 
-    public static int? Seed = null; // can be null, null => random seed // 936864398
+    public static int? Seed = 936864398; // can be null, null => random seed // 936864398
     public static double UpdateRate = 0f; // The rate at which .Next() is called in a cell; in miliseconds
     public static int ScheduleSize = 8; // The size of the schedules each cell has
     public static float MutationChance = 0.4f; // The chance that the next cell generation mutates 
