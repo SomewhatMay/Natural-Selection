@@ -12,6 +12,8 @@ using System.Collections.Generic;
 using Core.Schedule;
 using Other;
 using System.Threading.Tasks;
+using System.Threading;
+using System.Security;
 
 namespace Core;
 
@@ -59,10 +61,18 @@ public partial class MainWorld : Service {
     ScheduleService scheduleService;
 
 	// Create a list of tasks that house the grid divisons
-	List<Task> gridDivisionList;
+	List<Task> gridDivisionThreadsList;
 
-    // Create a 2D array for all the cells that will be repasted. Loading on stack so garbage collector doesnt get mad lol
-    Cell?[,] repastableCells = new Cell?[GameConstants.WorldExtents.X, GameConstants.WorldExtents.Y];
+	// Calculate the region sizes for the threaded contaienr
+	int threadExtents;
+	int XRegionSize;
+	int YRegionSize;
+
+	// Create a 2D array for all the cells that will be repasted. Loading on stack so garbage collector doesnt get mad lol
+	Cell?[,] repastableCells = new Cell?[GameConstants.WorldExtents.X, GameConstants.WorldExtents.Y];
+
+	// Let's create an array that houses the number of 'repastableCells' arrays needed per thread
+	Cell[,][,] repastableCellsContainer;
 
     #nullable disable
     public MainWorld(Game game, Random gameRandom) : base(game) {
@@ -70,8 +80,26 @@ public partial class MainWorld : Service {
         this.gameRandom = gameRandom;
 		Statistics.UpdateRate = GameConstants.UpdateRate;
 
-		gridDivisionList = new List<Task>();
-        lastUpdate = new DifferenceTime();
+		threadExtents = (int) Math.Sqrt(GameConstants.Threads);
+
+		gridDivisionThreadsList = new List<Task>();
+		repastableCellsContainer = new Cell[threadExtents, threadExtents][,];
+
+		// Create 2D array full of 2D repasteArrays
+		for (int containerIndexX = 0; containerIndexX < threadExtents; ++containerIndexX)
+		{
+			for (int containerIndexY = 0; containerIndexY < threadExtents; ++containerIndexY)
+			{
+				// Create a 2D repaste array inside the current index
+				repastableCellsContainer[containerIndexX, containerIndexY]
+					= new Cell[GameConstants.WorldExtents.X, GameConstants.WorldExtents.Y];
+			}
+		}
+
+		XRegionSize = GameConstants.WorldExtents.X / threadExtents;
+		YRegionSize = GameConstants.WorldExtents.Y / threadExtents;
+
+		lastUpdate = new DifferenceTime();
         generationElapsedTime = new DifferenceTime();
 
         gameGrid = new Grid(GameConstants.WorldExtents);
@@ -229,6 +257,89 @@ public partial class MainWorld : Service {
         generationElapsedTime.Start();
     }
 
+	private bool ProcessCell(Cell cell, Cell[,] repsateTable, int currentDay, int currentGeneration)
+	{
+		bool repaste = false; // whether we should repaste the cell into the next grid
+
+		if (cell is LifeCell)
+		{
+			LifeCell lifeCell = (LifeCell)cell;
+
+			if (lifeCell.Alive)
+			{
+				lifeCell.Next();
+				repaste = true;
+
+				// Lets check if two cells overlap, and if they do, then let's garrison the one with the lower points
+
+				Cell residingCell = gameGrid.GetInGrid(lifeCell.Position);
+
+				if ((residingCell is LifeCell) && (!residingCell.Equals(lifeCell)))
+				{
+					LifeCell residingLifeCell = (LifeCell)residingCell;
+					LifeCell garrisonedCell;
+
+					if (residingLifeCell.Points > lifeCell.Points)
+					{
+						garrisonedCell = lifeCell;
+						repaste = false;
+					}
+					else
+					{
+						garrisonedCell = residingLifeCell;
+
+						// Remove the garrisoned cell from being repastable
+						repastableCells[garrisonedCell.Position.X, garrisonedCell.Position.Y] = null;
+					}
+
+					garrisonedCell.Points += GameConstants.RewardSetting.Death;
+					garrisonedCell.Alive = false;
+
+					++Statistics.CellsGarrisoned;
+					--Statistics.CellsAlive;
+
+					garrisonedCells.Add(garrisonedCell);
+				}
+				else if (residingCell is FoodCell)
+				{
+					FoodCell residingFoodCell = (FoodCell)residingCell;
+
+					residingFoodCell.Alive = false;
+
+					++Statistics.FoodEaten;
+					--Statistics.FoodAlive;
+
+					++lifeCell.Points;
+
+					// Remove the food cell from being repastable
+					repastableCells[residingFoodCell.Position.X, residingFoodCell.Position.Y] = null;
+
+					if (isFoodFinished())
+					{
+						// break out of the whole loop because there is no more food left!
+						return false;
+					}
+				}
+			}
+		}
+		else if (cell is FoodCell)
+		{
+			FoodCell foodCell = (FoodCell)cell;
+
+			if (foodCell.Alive)
+			{
+				repaste = true;
+			}
+		}
+
+		if (repaste)
+		{
+			repsateTable[cell.Position.X, cell.Position.Y] = cell;
+		}
+
+		return (currentDay == Statistics.Day) && (currentGeneration == Statistics.Generation);
+	}
+
     public void NextDay() {
 
         ++Statistics.Day; // increment the day
@@ -236,88 +347,64 @@ public partial class MainWorld : Service {
         int currentDay = Statistics.Day;
         int currentGeneration = Statistics.Generation;
 
-        Array.Clear(repastableCells);
+		// Clear the list from the previous NextDay() call
+		gridDivisionThreadsList.Clear();
 
-        gameGrid.IterateExclusiveAll((Cell cell) => {
-            bool repaste = false; // whether we should repaste the cell into the next grid
+		// Create 2D array full of 2D repasteArrays
+		for (int containerIndexX = 0; containerIndexX < threadExtents; ++containerIndexX)
+		{
+			for (int containerIndexY = 0; containerIndexY < threadExtents; ++containerIndexY)
+			{
+				// Get the repasteTable and clear the array inside it;
+				Cell[,] repasteTable = repastableCellsContainer[containerIndexX, containerIndexY];
+				Array.Clear(repasteTable);
 
-            if (cell is LifeCell) {
-                LifeCell lifeCell = (LifeCell) cell;
+				int currentIndexX = containerIndexX, currentIndexY = containerIndexY;
 
-                if (lifeCell.Alive) {
-                    lifeCell.Next();
-                    repaste = true;
+				// Let's create a threaded task
+				gridDivisionThreadsList.Add(
+					Task.Run(() =>
+					{
+						// Let's iterate exclusively on the coordinates
+						gameGrid.IterateExclusiveRegion(
+							currentIndexX * XRegionSize, // Top left X
+							currentIndexY * YRegionSize, // Top left Y
+							XRegionSize, // Size X
+							YRegionSize, // Size Y
+							(Cell cell) =>
+							{
+								return ProcessCell(cell, repasteTable, currentDay, currentGeneration);
+							}
+						);
 
-                    // Lets check if two cells overlap, and if they do, then let's garrison the one with the lower points
+						//Console.WriteLine($"@({currentIndexX}, {currentIndexY}), working on areas ({currentIndexX * XRegionSize}, {currentIndexY * YRegionSize}) with size ({XRegionSize}, {YRegionSize})");
+					})
+				);
+			}
+		}
 
-                    Cell residingCell = gameGrid.GetInGrid(lifeCell.Position);
-
-                    if ((residingCell is LifeCell) && (!residingCell.Equals(lifeCell))) {
-                        LifeCell residingLifeCell = (LifeCell) residingCell;
-                        LifeCell garrisonedCell;
-
-                        if (residingLifeCell.Points > lifeCell.Points) {
-                            garrisonedCell = lifeCell;
-                            repaste = false;
-                        } else {
-                            garrisonedCell = residingLifeCell;
-
-                            // Remove the garrisoned cell from being repastable
-                            repastableCells[garrisonedCell.Position.X, garrisonedCell.Position.Y] = null;
-                        }
-
-                        garrisonedCell.Points += GameConstants.RewardSetting.Death;
-                        garrisonedCell.Alive = false;
-
-                        ++Statistics.CellsGarrisoned;
-                        --Statistics.CellsAlive;
-
-                        garrisonedCells.Add(garrisonedCell);
-                    } else if (residingCell is FoodCell) {
-                        FoodCell residingFoodCell = (FoodCell) residingCell;
-
-                        residingFoodCell.Alive = false;
-
-                        ++Statistics.FoodEaten;
-                        --Statistics.FoodAlive;
-
-                        ++lifeCell.Points;
-
-                        // Remove the food cell from being repastable
-                        repastableCells[residingFoodCell.Position.X, residingFoodCell.Position.Y] = null;
-
-                        if (isFoodFinished()) {
-                            // break out of the whole loop because there is no more food left!
-                            return false;
-                        }
-                    }
-                } 
-            } else if (cell is FoodCell) {
-                FoodCell foodCell = (FoodCell) cell;
-
-                if (foodCell.Alive) {
-                    repaste = true;
-                }
-            }
-
-            if (repaste) {
-                repastableCells[cell.Position.X, cell.Position.Y] = cell;
-            }
-
-            return (currentDay == Statistics.Day) && (currentGeneration == Statistics.Generation);
-        });
-
-        
+		Task.WaitAll(gridDivisionThreadsList.ToArray());
 
         if ((currentDay == Statistics.Day) && (currentGeneration == Statistics.Generation)) {
             // Let's empty the gamegrid and then fill it up with the cells to be repasted
             gameGrid.Clear();
 
-            foreach (Cell? repastableCell in repastableCells) {
-                if (repastableCell != null) {
-                    gameGrid.InsertCell(repastableCell);
-                }
-            }
+			for (int containerIndexX = 0; containerIndexX < threadExtents; ++containerIndexX)
+			{
+				for (int containerIndexY = 0; containerIndexY < threadExtents; ++containerIndexY)
+				{
+					// Get the repasteTable and iterate through it
+					Cell[,] repasteTable = repastableCellsContainer[containerIndexX, containerIndexY];
+
+					foreach (Cell? repastableCell in repasteTable)
+					{
+						if (repastableCell != null)
+						{
+							gameGrid.InsertCell(repastableCell);
+						}
+					}
+				}
+			}
         }
     }
 

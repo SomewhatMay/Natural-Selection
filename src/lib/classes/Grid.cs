@@ -44,7 +44,7 @@ public class Grid {
         // Check if there is already a cell in a specific position
         Cell? currentValue = GetInGrid(cell.Position.X, cell.Position.Y);
         if (currentValue != null) {
-            throw new System.Exception($"Cannot overwrite a grid field that already has a cell. Current Cell Type:{currentValue.GetType()}. New cell:{cell.GetType()}");
+            //throw new System.Exception($"Cannot overwrite a grid field that already has a cell.\nCurrent Cell Type: {currentValue.GetType()}. \nNew cell: {cell.GetType()}\nCurrent Position Overlap: ({currentValue.Position.X}, {currentValue.Position.Y})");
         }
 
         cellList.Add(cell);
@@ -64,7 +64,7 @@ public class Grid {
         return cellGrid[X, Y];
     }
 
-    // Exclusive by deafult
+    // not exclusiv
     public void FillGrid(FillDelegate callback) {
         for (int X = 0; X < worldSize.X; ++X) {
             for (int Y = 0; Y < worldSize.Y; ++Y) {

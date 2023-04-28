@@ -7,13 +7,15 @@ namespace Constants;
 public static class GameConstants {
 	public static string version = "1.9.2";
 
-    public static int? Seed = null; // can be null, null => random seed // 936864398
+    public static int? Seed = 936864398; // can be null, null => random seed // 936864398
     public static double UpdateRate = 0f; // The rate at which .Next() is called in a cell; in miliseconds
     public static int ScheduleSize = 8; // The size of the schedules each cell has
     public static float MutationChance = 0.4f; // The chance that the next cell generation mutates 
     public static int ChanceMax = 1000; // the max value put in when calculating the number of cells to be generated
 
-	public static int Threads = 4; // The number of threads that the game should split the game grid up into
+	// The number of threads that the game should split the game grid up into
+	// *** NOTE *** Ensure this is a square number!
+	public static int Threads = 4;
 
     // The values to watch for when determining which cell to spawn
     public static int[] LifeCellRandomValues = new int[1] { 1 };
