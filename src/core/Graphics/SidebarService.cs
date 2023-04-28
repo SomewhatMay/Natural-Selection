@@ -61,4 +61,10 @@ public class SidebarService : Service {
 	public override void Update(GameTime gameTime) {
 		base.Update(gameTime);
 	}
+
+	public override void Draw(GameTime gameTime)
+	{
+		sceneInfo.Draw(gameTime);
+		base.Draw(gameTime);
+	}
 }

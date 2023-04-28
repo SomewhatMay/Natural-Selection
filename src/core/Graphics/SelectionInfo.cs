@@ -6,6 +6,8 @@ using System.Threading;
 using Constants;
 using System.Runtime.InteropServices;
 using System;
+using System.Diagnostics;
+using NaturalSelectionRemastered.src.lib.graphical_interface;
 
 namespace Core.Graphics;
 

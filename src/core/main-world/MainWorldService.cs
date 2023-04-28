@@ -11,6 +11,7 @@ using Constants;
 using System.Collections.Generic;
 using Core.Schedule;
 using Other;
+using System.Threading.Tasks;
 
 namespace Core;
 
@@ -51,10 +52,14 @@ public partial class MainWorld : Service {
 
     Random gameRandom;
 
+	bool isUpdating = false; // Let's just create it in case so we dont have thread overflow
     DifferenceTime lastUpdate;
     DifferenceTime generationElapsedTime;
 
     ScheduleService scheduleService;
+
+	// Create a list of tasks that house the grid divisons
+	List<Task> gridDivisionList;
 
     // Create a 2D array for all the cells that will be repasted. Loading on stack so garbage collector doesnt get mad lol
     Cell?[,] repastableCells = new Cell?[GameConstants.WorldExtents.X, GameConstants.WorldExtents.Y];
@@ -65,6 +70,7 @@ public partial class MainWorld : Service {
         this.gameRandom = gameRandom;
 		Statistics.UpdateRate = GameConstants.UpdateRate;
 
+		gridDivisionList = new List<Task>();
         lastUpdate = new DifferenceTime();
         generationElapsedTime = new DifferenceTime();
 
@@ -330,10 +336,13 @@ public partial class MainWorld : Service {
 			NextDay();
 		}
 
-		if (lastUpdate.Calculate() >= Statistics.UpdateRate && (GameState == GameState.RUNNING))
+		if ((lastUpdate.Calculate() >= Statistics.UpdateRate) && (GameState == GameState.RUNNING) && (!isUpdating))
 		{
+			isUpdating = true;
 
             NextDay();
+
+			isUpdating = false;
 
             lastUpdate.Start();
         }

@@ -12,6 +12,8 @@ using System.Security.Principal;
 using System.Net.Http.Headers;
 using System.Reflection;
 using static Core.MainWorld;
+using NaturalSelectionRemastered.src.lib.graphical_interface;
+using System.Diagnostics;
 
 namespace Core.Graphics;
 
@@ -24,8 +26,12 @@ public class SceneInfo {
 
 	private GraphicsService graphicsService;
 	private Frame sidebarFrame;
+	private Process currentProcess;
+	private FrameCounter frameCounter;
 
 	public SceneInfo() {
+		frameCounter = new FrameCounter();
+		currentProcess = Process.GetCurrentProcess();
 		children = new Dictionary<string, GraphicalInstance>();
 	}
 
@@ -79,8 +85,10 @@ public class SceneInfo {
 		}
 	}
 
-	// Just a helper function that loads all the entries :)
+	// Loading entries :)
 
+	FrameEntry FPS;
+	FrameEntry Memory;
 	FrameEntry UpdateRate;
 	FrameEntry GameState;
 	FrameEntry Generation;
@@ -96,12 +104,13 @@ public class SceneInfo {
 	Point TitleLabelPadding = new Point(5, 5);
 	Point ValueLabelPadding = new Point(-5, 5);
 	int entryPad = 5;
-
+	
 	private int getPositionByIndex(int index) 
 	{
 		return ((index + 1) * entryPad) + (index * entryHeight);
 	}
 
+	// Just a method to create similar entries :)
 	private FrameEntry createSceneEntry(string title, int index) 
 	{
 		Point position = new Point(entryPad, getPositionByIndex(index));
@@ -120,19 +129,23 @@ public class SceneInfo {
 		return entry;
 	}
 
+	// Just a helper function that loads all the entries :)
 	private void LoadEntries() {
 		entrySize = new Point(entriesParent.Size.X - 10, entryHeight);
 
 		// Let's create all of the entries
-		UpdateRate = createSceneEntry("Update Rate", 0);
-		GameState = createSceneEntry("Game State", 1);
-		Generation = createSceneEntry("Generation", 2);
-		Day = createSceneEntry("Day", 3);
-		CellInfo = createSceneEntry("Cell Info", 4);
-		FoodInfo = createSceneEntry("Food Info", 5);
+		FPS = createSceneEntry("FPS", 0);
+		Memory = createSceneEntry("Memory", 1);
+
+		UpdateRate = createSceneEntry("Update Rate", 2);
+		GameState = createSceneEntry("Game State", 3);
+		Generation = createSceneEntry("Generation", 4);
+		Day = createSceneEntry("Day", 5);
+		CellInfo = createSceneEntry("Cell Info", 6);
+		FoodInfo = createSceneEntry("Food Info", 7);
 
 		// Let's create a text button for the pause game
-		Point position = new Point(entryPad, getPositionByIndex(6));
+		Point position = new Point(entryPad, getPositionByIndex(8));
 		PauseButton = new FramedTextObject(position, entrySize);
 		PauseButton.Parent = entriesParent;
 		PauseButton.Text = "Pause Game";
@@ -182,6 +195,14 @@ public class SceneInfo {
 		MainWorld.Statistics.OnCellsAliveChanged += OnCellInfoChanged;
 		MainWorld.Statistics.OnCellsGarrisonedChanged += OnCellInfoChanged;
 		OnCellInfoChanged(EventArgs.Empty);
+	}
+
+	public void Draw(GameTime gameTime)
+	{
+		frameCounter.Update((float) gameTime.ElapsedGameTime.TotalSeconds);
+		FPS.ValueText = Math.Floor(frameCounter.AverageFramesPerSecond).ToString();
+		// Diviidng by 1048576 which is 1024 * 1024 (B -> MB)
+		Memory.ValueText = Math.Floor(currentProcess.PrivateMemorySize64 / 1048576f).ToString() + " MB";
 	}
 
 	// Create listeners for each of the entries
