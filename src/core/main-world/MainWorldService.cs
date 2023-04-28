@@ -289,7 +289,7 @@ public partial class MainWorld : Service {
 						garrisonedCell = residingLifeCell;
 
 						// Remove the garrisoned cell from being repastable
-						repastableCells[garrisonedCell.Position.X, garrisonedCell.Position.Y] = null;
+						repsateTable[garrisonedCell.Position.X, garrisonedCell.Position.Y] = null;
 					}
 
 					garrisonedCell.Points += GameConstants.RewardSetting.Death;
@@ -312,7 +312,7 @@ public partial class MainWorld : Service {
 					++lifeCell.Points;
 
 					// Remove the food cell from being repastable
-					repastableCells[residingFoodCell.Position.X, residingFoodCell.Position.Y] = null;
+					repsateTable[residingFoodCell.Position.X, residingFoodCell.Position.Y] = null;
 
 					if (isFoodFinished())
 					{
