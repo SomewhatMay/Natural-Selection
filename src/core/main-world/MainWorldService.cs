@@ -14,6 +14,7 @@ using Other;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Security;
+using BenchmarkDotNet.Attributes;
 
 namespace Core;
 
@@ -63,6 +64,9 @@ public partial class MainWorld : Service {
 	// Create a list of tasks that house the grid divisons
 	List<Task> gridDivisionThreadsList;
 
+	// Create a countdown event to determine when all threads are done processing their respective cells
+	CountdownEvent threadCountdownEvent;
+
 	// Calculate the region sizes for the threaded contaienr
 	int threadExtents;
 	int XRegionSize;
@@ -82,6 +86,7 @@ public partial class MainWorld : Service {
 
 		threadExtents = (int) Math.Sqrt(GameConstants.Threads);
 
+		threadCountdownEvent = new CountdownEvent(GameConstants.Threads);
 		gridDivisionThreadsList = new List<Task>();
 		repastableCellsContainer = new Cell[threadExtents, threadExtents][,];
 
@@ -340,7 +345,7 @@ public partial class MainWorld : Service {
 		return (currentDay == Statistics.Day) && (currentGeneration == Statistics.Generation);
 	}
 
-    public void NextDay() {
+	public void NextDay() {
 
         ++Statistics.Day; // increment the day
 
@@ -348,7 +353,8 @@ public partial class MainWorld : Service {
         int currentGeneration = Statistics.Generation;
 
 		// Clear the list from the previous NextDay() call
-		gridDivisionThreadsList.Clear();
+		//gridDivisionThreadsList.Clear();
+		threadCountdownEvent.Reset(GameConstants.Threads);
 
 		// Create 2D array full of 2D repasteArrays
 		for (int containerIndexX = 0; containerIndexX < threadExtents; ++containerIndexX)
@@ -361,29 +367,29 @@ public partial class MainWorld : Service {
 
 				int currentIndexX = containerIndexX, currentIndexY = containerIndexY;
 
-				// Let's create a threaded task
-				gridDivisionThreadsList.Add(
-					Task.Run(() =>
-					{
-						// Let's iterate exclusively on the coordinates
-						gameGrid.IterateExclusiveRegion(
-							currentIndexX * XRegionSize, // Top left X
-							currentIndexY * YRegionSize, // Top left Y
-							XRegionSize, // Size X
-							YRegionSize, // Size Y
-							(Cell cell) =>
-							{
-								return ProcessCell(cell, repasteTable, currentDay, currentGeneration);
-							}
-						);
+				// Let's add the task to the ThreadPool
 
-						//Console.WriteLine($"@({currentIndexX}, {currentIndexY}), working on areas ({currentIndexX * XRegionSize}, {currentIndexY * YRegionSize}) with size ({XRegionSize}, {YRegionSize})");
-					})
-				);
+				ThreadPool.QueueUserWorkItem((state) =>
+				{
+					// Let's iterate exclusively on the coordinates
+					gameGrid.IterateExclusiveRegion(
+						currentIndexX * XRegionSize, // Top left X
+						currentIndexY * YRegionSize, // Top left Y
+						XRegionSize, // Size X
+						YRegionSize, // Size Y
+						(Cell cell) =>
+						{
+							return ProcessCell(cell, repasteTable, currentDay, currentGeneration);
+						}
+					);
+
+					threadCountdownEvent.Signal();
+					//Console.WriteLine($"@({currentIndexX}, {currentIndexY}), working on areas ({currentIndexX * XRegionSize}, {currentIndexY * YRegionSize}) with size ({XRegionSize}, {YRegionSize})");
+				});
 			}
 		}
 
-		Task.WaitAll(gridDivisionThreadsList.ToArray());
+		threadCountdownEvent.Wait();
 
         if ((currentDay == Statistics.Day) && (currentGeneration == Statistics.Generation)) {
             // Let's empty the gamegrid and then fill it up with the cells to be repasted

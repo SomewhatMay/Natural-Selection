@@ -104,6 +104,7 @@ public class Grid {
         => IterateExclusiveRegion(new QuadTreeRect((float) x, (float) y, (float) width, (float) height), callback);
 
     public void IterateExclusiveRegion(QuadTreeRect searchArea, IterateExclusiveDelegate callback) {
+		//Console.WriteLine(searchArea);
         Cell[] cellsInRegion = quadGrid.FindObjects(searchArea);
 
         //Console.WriteLine($"Got {cellsInRegion.Length} in area");
